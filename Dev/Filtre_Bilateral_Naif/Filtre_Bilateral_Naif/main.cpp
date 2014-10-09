@@ -26,21 +26,20 @@ int main(int argc, char **argv) {
 //   start = clock();
   
   FiltreBilateral fb(fsigmaS, fsigmaR, img);
-  CImg<double> fbImg = fb.applyFilter();
+  CImg<double> moyImg = fb.moyennePixel();
+// CImg<double> fbImg = fb.applyFilter();
 //   temps = (double)(clock()-start)/(double) CLOCKS_PER_SEC;
 //   
 //   cout<< "Temps d'éxécution : " << temps << endl;
 //   
-  fbImg.save_bmp("filtrebilateral");
+//   fbImg.save_bmp("filtrebilateral");
   
 //   CImgDisplay main(img, "Normal");
-//   CImgDisplay windows_fb(fbImg, "Filtre bilateral");
+  CImgDisplay windows_fb(moyImg, "Image moyenne");
 // 
-//   while(!main.is_closed() && !windows_fb.is_closed()){
-//     main.wait();
-//   }
+  while(!windows_fb.is_closed()){
+    windows_fb.wait();
+  }
   
   return 0;
 }
-
-

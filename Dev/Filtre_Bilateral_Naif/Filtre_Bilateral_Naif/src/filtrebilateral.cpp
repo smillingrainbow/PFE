@@ -104,7 +104,36 @@ double FiltreBilateral::distanceEuclidienne(int xP, int yP, int xQ, int yQ){
 
 CImg<double> FiltreBilateral::moyennePixel(){
 
+  CImg<double> res(width, height, img.depth(), img.spectrum(),0);
+  double moy;
+  int compt;
+  cimg_forX(res, x){ // parcours largeur
+    cimg_forY(res, y){ // parcours longueur
+      compt=0;
+      moy = 0;
+      if(x!=0){ // bordure supérieure
+	compt++;
+	moy += img._atXY(x, y-1);
+      }
+      if(x!= res.height()-1){ // bordure inférieur
+	compt++;
+	moy += img._atXY(x, y+1);
+	
+      }
+      if(y!=0){ // bordure gauche
+	moy += img._atXY(x-1, y);
+	compt++;
+      }
+      if(y!= img.width()-1){ // bordure droite
+	moy += img._atXY(x+1, y);
+	compt++;
+      }
+      moy = moy/compt;
+      res.set_linear_atXY(moy, x, y);
+    }
+  }
   
+  return res;
 }
 
 
