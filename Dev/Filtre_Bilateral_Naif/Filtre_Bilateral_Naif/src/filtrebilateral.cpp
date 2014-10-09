@@ -50,8 +50,10 @@ CImg<double>* FiltreBilateral::applyFilter()
   // parcours de l'image sur la longeur (y) et la largeur(x)
   cimg_forXY(img, x, y){
     
-    return bfImg;
+   
   }
+  
+   return bfImg;
 }
 
 

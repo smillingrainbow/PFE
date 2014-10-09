@@ -32,7 +32,7 @@ public:
   
 private:
   
-  CImg<double> applyFilter();
+  CImg<double>* applyFilter();
   
   CImg<double> img;
   float fSigmaS;
