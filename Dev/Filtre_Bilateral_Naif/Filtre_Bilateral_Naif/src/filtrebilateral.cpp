@@ -42,7 +42,7 @@ FiltreBilateral::FiltreBilateral(float fsigmaS, float fsigmaR, CImg<double> Cimg
   height = img.height();
 }
 
-FiltreBilateral::applyFilter()
+CImg<double>* FiltreBilateral::applyFilter()
 {
   // crée une image avec les mêmes caractéristiques que l'actuelle et rempli de 0
   CImg<double> *bfImg = new CImg<double>(width, height, img.depth(), img.spectrum(),0);
@@ -50,7 +50,7 @@ FiltreBilateral::applyFilter()
   // parcours de l'image sur la longeur (y) et la largeur(x)
   cimg_forXY(img, x, y){
     
-    
+    return bfImg;
   }
 }
 
