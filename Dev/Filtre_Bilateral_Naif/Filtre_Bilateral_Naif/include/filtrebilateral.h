@@ -18,8 +18,10 @@
 #ifndef FILTREBILATERAL_H
 #define FILTREBILATERAL_H
 
+#define _USE_MATH_DEFINES
 #include "CImg.h"
-using namespace cimg_library;
+#include <cmath>
+
 
 class FiltreBilateral
 {
@@ -27,14 +29,19 @@ public:
   FiltreBilateral();
   FiltreBilateral(const FiltreBilateral& other);
   ~FiltreBilateral();
-  FiltreBilateral(float fsigmaS, float fsigmaR, CImg<double> Cimg);
+  FiltreBilateral(float fsigmaS, float fsigmaR, const cimg_library::CImg<double> &input);
+  cimg_library::CImg<double> applyFilter();
   
+  cimg_library::CImg<double> moyennePixel();
   
 private:
   
-  CImg<double>* applyFilter();
   
-  CImg<double> img;
+  
+  double gaussianConvolution(double value, float sigma);
+  double distanceEuclidienne(int xP, int yP, int xQ, int yQ);
+  
+  cimg_library::CImg<double> img;
   float fSigmaS;
   float fSigmaR;
   int width;
