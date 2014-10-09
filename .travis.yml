@@ -2,4 +2,4 @@ language: cpp
 compiler:
 - gcc
 - clang
-script : "./run_build.sh"
+script : make
