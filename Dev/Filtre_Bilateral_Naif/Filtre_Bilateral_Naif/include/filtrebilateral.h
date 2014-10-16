@@ -21,6 +21,7 @@
 #define _USE_MATH_DEFINES
 #include "CImg.h"
 #include <cmath>
+#include <iostream>
 
 
 class FiltreBilateral
