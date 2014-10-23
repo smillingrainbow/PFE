@@ -2,7 +2,7 @@ CC=clang++
 # CC=g++
 LIBS=-lreadline -lpthread -lm -lX11
 EXEC=filtre_bilateral
-CCFLAGS=-g -Wall -Wextra -pedantic -O2
+CCFLAGS= -g -Wall -Wextra -pedantic 
 
 BIN_DIR=bin
 SRC_DIR=src

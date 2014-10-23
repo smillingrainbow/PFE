@@ -117,11 +117,12 @@ int main(int argc, char **argv) {
 //   CImg<double> moyImg = filtre_moyen(img);
 //   CImgDisplay windows_moy(moyImg, "Image moyenne");
   
-    CImg<double> bGaussImg = ajout_bruit_gaussien(img);
-    CImgDisplay windows_bGauss(bGaussImg, "Bruit gaussien");
-  
-//   CImg<double> fbImg = filtre_bilateral(img, nomImg);
-//   CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
+//     CImg<double> bGaussImg = ajout_bruit_gaussien(img);
+//     CImgDisplay windows_bGauss(bGaussImg, "Bruit gaussien");
+//     CImg<double> fbImg = filtre_bilateral(bGaussImg, nomImg);
+//     CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
+  CImg<double> fbImg = filtre_bilateral(img, nomImg);
+  CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
   
   CImgDisplay main(img, "Normal");
 

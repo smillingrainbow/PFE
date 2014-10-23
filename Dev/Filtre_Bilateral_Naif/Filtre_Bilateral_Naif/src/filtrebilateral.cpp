@@ -31,7 +31,7 @@ FiltreBilateral::~FiltreBilateral(){}
 
 FiltreBilateral::FiltreBilateral(float fsigmaS, float fsigmaR, const CImg<double> &input):img(input), fSigmaS(fsigmaS), fSigmaR(fsigmaR), width(input.width()), height(input.height()){}
 
-FiltreBilateral::FiltreBilateral(const CImg<double> &input): img(input),width(input.width()), height(input.height()), fSigmaS(0), fSigmaR(0){}
+FiltreBilateral::FiltreBilateral(const CImg<double> &input): img(input),fSigmaS(0), fSigmaR(0),width(input.width()), height(input.height()){}
 
 
 CImg<double> FiltreBilateral::applyFilter()
@@ -40,18 +40,20 @@ CImg<double> FiltreBilateral::applyFilter()
   //return res;
   // crée une image avec les mêmes caractéristiques que l'actuelle et rempli de 0
   CImg<double> bfImg(width, height, img.depth(), img.spectrum(),0);
-  double wp = 0;
+  double wp[img.spectrum()];
   int size = 21;
   int iXdebut=0, iYdebut=0, iXfin=0, iYfin=0;
   double gauss=0;
+  double dist=0;
   
   
   // parcours de l'image sur la longeur (y) et la largeur(x)
   cimg_forX(img, x){
     cimg_forY(img, y){
-      wp = 0;
-   
-    
+      for(int iColor=0; iColor<= img.spectrum(); iColor++){
+	  wp[iColor] = 0;
+      }
+      
       // parcours d'un carré de 21x21 autour du pixel courant
       // délimitation des variables de parcours en fonction de la position du pixel
       if(x<(size/2)-1){
@@ -86,15 +88,22 @@ CImg<double> FiltreBilateral::applyFilter()
 	
 	// parcours sur la longueur
 	for(int iY=iYdebut; iY<=iYfin; iY++){
-	    gauss = loiGaussienne(distanceEuclidienne(x, y, iX, iY), fSigmaS) * loiGaussienne(fabs(img._atXY(x, y) - img._atXY(iX, iY)), fSigmaR);
 	  
-	    bfImg.set_linear_atXY(bfImg._atXY(x,y)+(gauss*img._atXY(iX,iY)), x, y);
-	    wp += gauss;
+	  dist = distanceEuclidienne(x, y, iX, iY);
 	  
+	  for(int iColor=0; iColor<= img.spectrum(); iColor++){
+	    gauss = loiGaussienne(dist, fSigmaS) * loiGaussienne(fabs(img._atXYZC(x, y, 0 , iColor) - img._atXYZC(iX, iY, 0, iColor)), fSigmaR);  
+	    
+	    bfImg.set_linear_atXYZ(bfImg._atXYZC(x,y, 0, iColor)+(gauss*img._atXYZC(iX,iY, 0, iColor)), x, y, 0, iColor);
+	    
+	    wp[iColor] += gauss;
+	  }
+
 	}
       }
-    
-      bfImg.set_linear_atXY(bfImg._atXY(x,y)/wp  ,x,y);
+      for(int iColor=0; iColor<= img.spectrum(); iColor++){
+	bfImg.set_linear_atXYZ(bfImg._atXYZC(x,y, 0 , iColor)/wp[iColor]  ,x,y, 0, 0);
+      }
     }
   }
   
@@ -116,8 +125,12 @@ double FiltreBilateral::loiGaussienne(double value, float sigma){
  * calcul de la distance euclidienne entre 2 points P et Q
  */
 double FiltreBilateral::distanceEuclidienne(int xP, int yP, int xQ, int yQ){
-
-  double dist = sqrt(pow(xP - xQ, 2) + pow(yP - yQ, 2));
+  
+  double dist = 0;
+  for(int iColor=0; iColor<= img.spectrum(); iColor++){
+    dist += pow(img._atXYZC(xP, yP, 0, iColor) -img._atXYZC(xQ, yQ, 0, iColor),2 );
+  }
+  dist = sqrt(dist);
   return dist;
 }
 
@@ -160,6 +173,8 @@ CImg< double > FiltreBilateral::bruitGaussien(float sigma){
     double boxmuller = 0;
     double value = 0;
     double gauss = 0;
+    const double min=img.min(), max= img.max();
+    
     cimg_forX(res, x){ // parcours largeur
       cimg_forY(res, y){ // parcours longueur
 	value = img._atXY(x, y);
@@ -167,6 +182,13 @@ CImg< double > FiltreBilateral::bruitGaussien(float sigma){
 	gauss = loiGaussienne(boxmuller, sigma);
 	
 	value = value + gauss;
+	
+	if(value>max){
+	  value = max;
+	}
+	if(value < min){
+	  value = min;
+	}
 	
 	res.set_linear_atXY(value, x, y);
       }
