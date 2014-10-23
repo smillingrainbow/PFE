@@ -31,6 +31,9 @@ FiltreBilateral::~FiltreBilateral(){}
 
 FiltreBilateral::FiltreBilateral(float fsigmaS, float fsigmaR, const CImg<double> &input):img(input), fSigmaS(fsigmaS), fSigmaR(fsigmaR), width(input.width()), height(input.height()){}
 
+FiltreBilateral::FiltreBilateral(const CImg<double> &input): img(input),width(input.width()), height(input.height()), fSigmaS(0), fSigmaR(0){}
+
+
 CImg<double> FiltreBilateral::applyFilter()
 {
   //CImg<double> res(img);
@@ -83,7 +86,7 @@ CImg<double> FiltreBilateral::applyFilter()
 	
 	// parcours sur la longueur
 	for(int iY=iYdebut; iY<=iYfin; iY++){
-	    gauss = gaussianConvolution(distanceEuclidienne(x, y, iX, iY), fSigmaS) * gaussianConvolution(fabs(img._atXY(x, y) - img._atXY(iX, iY)), fSigmaR);
+	    gauss = loiGaussienne(distanceEuclidienne(x, y, iX, iY), fSigmaS) * loiGaussienne(fabs(img._atXY(x, y) - img._atXY(iX, iY)), fSigmaR);
 	  
 	    bfImg.set_linear_atXY(bfImg._atXY(x,y)+(gauss*img._atXY(iX,iY)), x, y);
 	    wp += gauss;
@@ -101,7 +104,7 @@ CImg<double> FiltreBilateral::applyFilter()
 /* calcul de la convolution gaussienne suivant sigma s de value
  * 
  */
-double FiltreBilateral::gaussianConvolution(double value, float sigma){
+double FiltreBilateral::loiGaussienne(double value, float sigma){
 
   double gauss = (1/(2*M_PI* pow(sigma,2))) * exp((-pow(value,2))/(2*pow(sigma,2)));
   
@@ -152,7 +155,51 @@ CImg<double> FiltreBilateral::moyennePixel(){
   return res;
 }
 
+CImg< double > FiltreBilateral::bruitGaussien(float sigma){
+    CImg<double> res(width, height, img.depth(), img.spectrum(), 0);
+    double boxmuller = 0;
+    double value = 0;
+    double gauss = 0;
+    cimg_forX(res, x){ // parcours largeur
+      cimg_forY(res, y){ // parcours longueur
+	value = img._atXY(x, y);
+	boxmuller = transformationBoxMuller(sigma);
+	gauss = loiGaussienne(boxmuller, sigma);
+	
+	value = value + gauss;
+	
+	res.set_linear_atXY(value, x, y);
+      }
+  }
+    
 
+   return res;
+}
+
+double FiltreBilateral::transformationBoxMuller(float sigma){
+  double res=0;
+  
+  static bool haveSpare = false;
+  static double rand1, rand2;
+
+  if(haveSpare)
+  {
+    haveSpare = false;
+    res = sqrt(sigma * rand1) * sin(rand2);
+  }
+  else{
+    haveSpare = true;
+
+    rand1 = rand() / ((double) RAND_MAX);
+    if(rand1 < 1e-100) rand1 = 1e-100;
+    rand1 = -2 * log(rand1);
+    rand2 = (rand() / ((double) RAND_MAX)) * 2 * M_PI;
+
+    res = sqrt(sigma * rand1) * cos(rand2);
+  }
+  
+  return res;
+}
 
 
 

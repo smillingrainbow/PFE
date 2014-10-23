@@ -31,16 +31,18 @@ public:
   FiltreBilateral(const FiltreBilateral& other);
   ~FiltreBilateral();
   FiltreBilateral(float fsigmaS, float fsigmaR, const cimg_library::CImg<double> &input);
+  FiltreBilateral(const cimg_library::CImg<double> &input);
   cimg_library::CImg<double> applyFilter();
   
   cimg_library::CImg<double> moyennePixel();
   
+  cimg_library::CImg<double> bruitGaussien(float sigma);
+  
 private:
   
-  
-  
-  double gaussianConvolution(double value, float sigma);
+  double loiGaussienne(double value, float sigma);
   double distanceEuclidienne(int xP, int yP, int xQ, int yQ);
+  double transformationBoxMuller(float sigma);
   
   cimg_library::CImg<double> img;
   float fSigmaS;

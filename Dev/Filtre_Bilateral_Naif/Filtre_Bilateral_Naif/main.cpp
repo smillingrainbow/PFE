@@ -18,23 +18,12 @@ inline std::string to_string (const T& t)
   return ss.str();
 }
 
+CImg<double> filtre_bilateral(CImg<double> img, string nomImg){
 
-int main(int argc, char **argv) {
-  
   double temps;
   clock_t start;
-  
-  
-  float fsigmaS;
-  float fsigmaR;
-  
-  string nomImg;
-   
-
-  
-  cout<<"Veuillez saisir le nom de l'image avec son extension (ex: lena.jpg)" << endl;
-  cin>> nomImg; 
-  
+  float fsigmaS, fsigmaR;
+ 
   cout<<"Veuillez saisir la valeur de sigma S (en pourcentage)."<< endl;
   cin>> fsigmaS;
   cout<<"Veuillez saisir la valeur de sigma R (en pourcentage)."<< endl;
@@ -42,27 +31,15 @@ int main(int argc, char **argv) {
   
   fsigmaS = fsigmaS/100;
   fsigmaR = fsigmaR/100;
-  
-  CImg<double> img(nomImg.c_str());
  
   string nomFichier = "resultat.txt";
   ofstream fichier(nomFichier.c_str(), ios::app);
- 
-  // FILTRE MOYEN
-  FiltreBilateral moy(fsigmaS, fsigmaR, img);
-  cout<< "Filtre moyen : début" << endl;
-  start = clock();
-  CImg<double> moyImg = moy.moyennePixel();
-  temps = (double)(clock()-start)/(double) CLOCKS_PER_SEC;
-  cout<< "Temps d'éxécution : " << temps  << " secondes" << endl;
-  cout<< "Filtre moyen : done" << endl;
-
-  
+   
   // FILTRE BILATERAL
   FiltreBilateral fb(fsigmaS, fsigmaR, img);
   cout<< "Filtre bilatéral : début" << endl;
   start = clock();
-  CImg<double> fbImg = moy.applyFilter();
+  CImg<double> fbImg = fb.applyFilter();
   temps = (double)(clock()-start)/(double) CLOCKS_PER_SEC;
   cout<< "Temps d'éxécution : " << temps  << " secondes" << endl;
   cout<< "Filtre bilatéral : done" << endl;
@@ -86,17 +63,74 @@ int main(int argc, char **argv) {
       
       fichier.close();
   }
+  return fbImg;
+}
+
+CImg<double> filtre_moyen(CImg<double> img){
+  double temps;
+  clock_t start;
   
+  // FILTRE MOYEN
+  FiltreBilateral moy(img);
+  cout<< "Filtre moyen : début" << endl;
+  start = clock();
+  CImg<double> moyImg = moy.moyennePixel();
+  temps = (double)(clock()-start)/(double) CLOCKS_PER_SEC;
+  cout<< "Temps d'éxécution : " << temps  << " secondes" << endl;
+  cout<< "Filtre moyen : done" << endl;
   
+  return moyImg;
+}
+
+CImg<double> ajout_bruit_gaussien(CImg<double> img){
+  double temps;
+  clock_t start;
+ 
+  float fsigma;
+  cout<<"Veuillez saisir la valeur de sigma (en pourcentage)."<< endl;
+  cin>> fsigma;
+  
+  fsigma = fsigma/100;
+  
+  // FILTRE MOYEN
+  FiltreBilateral bGauss(img);
+  cout<< "Ajout bruit gaussien : début" << endl;
+  start = clock();
+  CImg<double> bGaussImg = bGauss.bruitGaussien(fsigma);
+  temps = (double)(clock()-start)/(double) CLOCKS_PER_SEC;
+  cout<< "Temps d'éxécution : " << temps  << " secondes" << endl;
+  cout<< "Ajout bruit gaussien : done" << endl;
+  
+  return bGaussImg;
+  
+}
+
+int main(int argc, char **argv) {
+  
+  string nomImg;
+   
+  cout<<"Veuillez saisir le nom de l'image avec son extension (ex: lena.jpg)" << endl;
+  cin>> nomImg; 
+  
+  CImg<double> img(nomImg.c_str());
+  
+//   CImg<double> moyImg = filtre_moyen(img);
+//   CImgDisplay windows_moy(moyImg, "Image moyenne");
+  
+    CImg<double> bGaussImg = ajout_bruit_gaussien(img);
+    CImgDisplay windows_bGauss(bGaussImg, "Bruit gaussien");
+  
+//   CImg<double> fbImg = filtre_bilateral(img, nomImg);
+//   CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
   
   CImgDisplay main(img, "Normal");
-  CImgDisplay windows_moy(moyImg, "Image moyenne");
-  CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
 
-  while(!windows_fb.is_closed() && !main.is_closed() && !windows_moy.is_closed()){
-    windows_fb.wait();
+  while(!main.is_closed()){
     main.wait();
-    windows_moy.wait();
   }
   return 0;
 }
+
+
+
+
