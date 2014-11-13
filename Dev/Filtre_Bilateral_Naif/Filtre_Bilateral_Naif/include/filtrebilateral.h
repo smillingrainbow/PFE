@@ -42,6 +42,7 @@ private:
   
   double loiGaussienne(double value, float sigma);
   double distanceEuclidienne(int xP, int yP, int xQ, int yQ);
+  double distanceScalaire(int xP, int yP, int xQ, int yQ);
   double transformationBoxMuller(float sigma);
   
   cimg_library::CImg<double> img;

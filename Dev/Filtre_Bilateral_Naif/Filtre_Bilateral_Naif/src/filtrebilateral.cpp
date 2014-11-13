@@ -40,19 +40,18 @@ CImg<double> FiltreBilateral::applyFilter()
   //return res;
   // crée une image avec les mêmes caractéristiques que l'actuelle et rempli de 0
   CImg<double> bfImg(width, height, img.depth(), img.spectrum(),0);
-  double wp[img.spectrum()];
+  double wp=0;
   int size = 21;
   int iXdebut=0, iYdebut=0, iXfin=0, iYfin=0;
   double gauss=0;
-  double dist=0;
+  double distEuclidienne=0;
+  double distScalaire=0;
   
   
   // parcours de l'image sur la longeur (y) et la largeur(x)
   cimg_forX(img, x){
     cimg_forY(img, y){
-      for(int iColor=0; iColor<= img.spectrum(); iColor++){
-	  wp[iColor] = 0;
-      }
+      wp=0;
       
       // parcours d'un carré de 21x21 autour du pixel courant
       // délimitation des variables de parcours en fonction de la position du pixel
@@ -89,20 +88,20 @@ CImg<double> FiltreBilateral::applyFilter()
 	// parcours sur la longueur
 	for(int iY=iYdebut; iY<=iYfin; iY++){
 	  
-	  dist = distanceEuclidienne(x, y, iX, iY);
-	  
+	  distEuclidienne = distanceEuclidienne(x, y, iX, iY);
+	  distScalaire = distanceScalaire(x, y, iX, iY);
+	  gauss = loiGaussienne(distEuclidienne, fSigmaS) * 			loiGaussienne(distScalaire, fSigmaR); 
 	  for(int iColor=0; iColor<= img.spectrum(); iColor++){
-	    gauss = loiGaussienne(dist, fSigmaS) * loiGaussienne(fabs(img._atXYZC(x, y, 0 , iColor) - img._atXYZC(iX, iY, 0, iColor)), fSigmaR);  
-	    
+	     
 	    bfImg.set_linear_atXYZ(bfImg._atXYZC(x,y, 0, iColor)+(gauss*img._atXYZC(iX,iY, 0, iColor)), x, y, 0, iColor);
 	    
-	    wp[iColor] += gauss;
+	    wp += gauss;
 	  }
 
 	}
       }
       for(int iColor=0; iColor<= img.spectrum(); iColor++){
-	bfImg.set_linear_atXYZ(bfImg._atXYZC(x,y, 0 , iColor)/wp[iColor]  ,x,y, 0, 0);
+	bfImg.set_linear_atXYZ(bfImg._atXYZC(x,y, 0 , iColor)/wp, x,y, 0, iColor);
       }
     }
   }
@@ -126,6 +125,13 @@ double FiltreBilateral::loiGaussienne(double value, float sigma){
  */
 double FiltreBilateral::distanceEuclidienne(int xP, int yP, int xQ, int yQ){
   
+  double dist = pow(xP - xQ, 2) + pow(yP - yQ, 2);
+  dist = sqrt(dist);
+  return dist;
+}
+
+double FiltreBilateral::distanceScalaire(int xP, int yP, int xQ, int yQ)
+{
   double dist = 0;
   for(int iColor=0; iColor<= img.spectrum(); iColor++){
     dist += pow(img._atXYZC(xP, yP, 0, iColor) -img._atXYZC(xQ, yQ, 0, iColor),2 );
@@ -133,6 +139,7 @@ double FiltreBilateral::distanceEuclidienne(int xP, int yP, int xQ, int yQ){
   dist = sqrt(dist);
   return dist;
 }
+
 
 CImg<double> FiltreBilateral::moyennePixel(){
 
