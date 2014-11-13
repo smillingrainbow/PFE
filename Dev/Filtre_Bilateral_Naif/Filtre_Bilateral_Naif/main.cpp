@@ -18,19 +18,10 @@ inline std::string to_string (const T& t)
   return ss.str();
 }
 
-CImg<double> filtre_bilateral(CImg<double> img, string nomImg){
+CImg<double> filtre_bilateral(CImg<double> img, string nomImg, float fsigmaS, float fsigmaR){
 
   double temps;
   clock_t start;
-  float fsigmaS, fsigmaR;
- 
-  cout<<"Veuillez saisir la valeur de sigma S (en pourcentage)."<< endl;
-  cin>> fsigmaS;
-  cout<<"Veuillez saisir la valeur de sigma R (en pourcentage)."<< endl;
-  cin>> fsigmaR;
-  
-  fsigmaS = fsigmaS/100;
-  fsigmaR = fsigmaR/100;
  
   string nomFichier = "resultat.txt";
   ofstream fichier(nomFichier.c_str(), ios::app);
@@ -108,11 +99,7 @@ CImg<double> ajout_bruit_gaussien(CImg<double> img){
 int main(int argc, char **argv) {
   
   string nomImg;
-   
-  cout<<"Veuillez saisir le nom de l'image avec son extension (ex: lena.jpg)" << endl;
-  cin>> nomImg; 
-  
-  CImg<double> img(nomImg.c_str());
+  float fsigmaS, fsigmaR;
   
 //   CImg<double> moyImg = filtre_moyen(img);
 //   CImgDisplay windows_moy(moyImg, "Image moyenne");
@@ -121,10 +108,37 @@ int main(int argc, char **argv) {
 //     CImgDisplay windows_bGauss(bGaussImg, "Bruit gaussien");
 //     CImg<double> fbImg = filtre_bilateral(bGaussImg, nomImg);
 //     CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
-  CImg<double> fbImg = filtre_bilateral(img, nomImg);
+  
+  if(argc == 4){
+    nomImg = string(argv[1]);
+    fsigmaS = atof(argv[2]);
+    fsigmaR = atof(argv[3]);
+    
+    
+  }
+  else{
+    cout<<"Veuillez saisir le nom de l'image avec son extension (ex: lena.jpg)" << endl;
+    cin>> nomImg; 
+    
+    cout<<"Veuillez saisir la valeur de sigma S (en pourcentage)."<< endl;
+    cin>> fsigmaS;
+    
+    cout<<"Veuillez saisir la valeur de sigma R (en pourcentage)."<< endl;
+    cin>> fsigmaR;
+    
+    fsigmaS = fsigmaS/100;
+    fsigmaR = fsigmaR/100;
+    
+  }
+  
+  CImg<double> img(nomImg.c_str());
+  
+  CImg<double> fbImg = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
+  
   CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
   
   CImgDisplay main(img, "Normal");
+  
 
   while(!main.is_closed()){
     main.wait();
