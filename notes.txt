@@ -1,0 +1,39 @@
+PARTIE I
+	- Implémentation du filtre bilatéral (méthode naive)
+	- Utilisation du filtre bilatéral en débruitage
+		- prendre images
+		- temps de calcul
+		- echantillonner
+		- récupérer les psnr
+	- Utilisation du FB en décomposition
+		- trouver les différentes valeurs de s 2 param (sigma S et R) pour faire des décompostions + ou - forte
+	- Pyramide multi-échelle à partir du FB 
+		- lecture d'une partie de l'article
+		- implémentation d'une méthode
+		- test (beaucoup)
+	- Manipulation des détails
+		- 2 niveaux : 
+			- atténuation 
+			- réhaussement
+		- utiliser des coefficients multiplicateur pour atténuer ou réhausser les détails sur les différentes images résultant de la décomposition
+
+PARIE II
+	- Interface graphique
+		- charger image
+		- choisir un des 2 niveaux de détails et afficher le résultat
+		- possibilité d'introduire des informations manuellement 
+		- sauvegarde des images
+
+	- Accélération
+		- lire un article 
+		- étudier l'implémentation matlab 
+		- faire ma propre implémentation/algo
+		- comparaison avec CImg
+		- intégrer cette partie à l'application
+
+PARTIE III
+	Pistes : 
+		- Changer l'algo qui fait la décomposition (plus de travail sur le FB)
+			- méthode moindre carrés pondérés
+			- construire une structure de graphe et manipuler l'image à partir de ce graphe
+		- Travail sur les models 3D
