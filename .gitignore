@@ -1,2 +1,10 @@
 *.o
 Dev/Test/
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.log
+*.lof
+*.synctex.gz
+*.toc*.out
