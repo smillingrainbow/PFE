@@ -1,0 +1,586 @@
+% Maquette du cahier de spécification pour les PFE
+% version 02 du 21/10/2009
+% auteur :  Nicolas Ragot (nicolas.ragot@univ-tours.fr)
+% Document établi sur la base du standard IEEE std 830 
+%		et des documents de cours de Génie Logiciel de Polytech'Tours (Vincent T'Kindt)
+
+\documentclass[twoside,CDS]{EPURapport}% on reprend ici le style EPU rapport étendu au CDS (version du 21/10/2009)
+\input{include.tex}
+
+\thedocument{Cahier de spécification système \& plan de développement}{Développement d'un outil de traitement d'images par filtrage bilatéral  }{Cahier de spécification système}
+
+\grade{Département Informatique}
+
+%Liste des versions avec la date et les principales modifications
+\modifications{
+	\version{00} \dateModif{06/11/2014} \description{Rédaction de l'introduction et du contexte}
+}
+
+\authors{%non utilisé dans le CDS (remplacé par l'émetteur ci-dessous)
+	\category{Étudiants}{%
+		\name{Natacha \textsc{Marlio-Marette}} \mail{natacha.marlio-marette@etu.univ-tours.fr}
+	}
+	\details{DI5 2014 - 2015}
+}
+
+%l'émetteur remplace ici l'auteur du rapport de PFE
+\emetteur{Natacha \textsc{Marlio-Marette}}{natacha.marlio-marette@etu.univ-tours.fr}
+
+\supervisors{% non utilisés ici (remplacés par les validateurs ci-dessous)
+	\category{Encadrants}{%
+		\name{Moncef \textsc{Himane}} \mail{moncef.hidane@insa-cvl.fr}
+	}
+	\details{Université François-Rabelais, Tours}
+}
+\nosupervisors
+
+%Personnes ayant relu le cahier de spécif, avec la date, l'effectivité de la validation et d'éventuels commentaires
+\validators{%
+		\name{N Ragot} \dateValide{20/10/2009} \valide{O} \comment{Ok pour 2009-2010}
+		\name{N Ragot} \dateValide{20/10/2009} \valide{O} \comment{Ok pour 2009-2010}
+}
+
+\abstracts{Description en français}
+{Mots clés français}
+{Description en anglais}
+{Mots clés en anglais}
+
+\nolistoffigures
+\nolistoftables
+
+\begin{document}
+
+\part*{Cahier de spécification système}
+\addcontentsline{toc}{part}{Cahier de spécification système} 
+\setcounter{chapter}{1} 
+%on n'utilise pas ici de chapitre explicite car un chapitre est sur une page à part (partie=chapitre)
+% en revanche on utilise la numérotation quand même
+
+	\section{Introduction}
+%	Nature et objectifs du document, les acteurs mis en jeux (client, MOA, MOE), les auteurs, relecteurs,\ldots
+\paragraph{}
+	Ce cahier de spécification système décrit le contexte dans le quel est réalisé ce projet de fin d'étude suivit d'une description générale ainsi qu'une description de l'interface homme-machine et des fonctionnalités. A la suite, le plan de développement comprendra les différentes tâches du projet ainsi qu'un planning. 
+
+\paragraph{}	
+	Ce sujet a été proposé par un chercheur, Moncef \textsc{Hidane}, en analyse et reconnaissance des formes. Le maître d'ouvrage est le laboratoire RFAI(Reconnaissance des Formes et Analyse d'Images) de l'université François Rabelais de Tours. La maitrise d'?uvre sera réalisé par moi-même, Natacha \textsc{Marlio-Marette}, étudiante en cinquième année au sein du département informatique de l'école Polytech Tours. 
+
+
+		
+	\section{Contexte de la réalisation}
+	\subsection{Contexte}
+%		Définir les enjeux et le contexte général dans lequel s'inscrit le projet (domaine d'application, marché, cible,\ldots)
+
+\paragraph{}
+	Ce projet répond à la demande d'un chercheur de l'INSA de Blois en analyse et reconnaissance des formes en collaboration avec le laboratoire RFAI de l'université de François Rabelais de Tours. 	
+	
+\paragraph{}
+	Ce projet de fin d'étude porte sur la mise en place d'un filtre bilatéral. Ce filtre est utilisé afin de lisser les petites variations d'intensité et préservé les contours des détails, le résultat obtenu sera appelé la couche de base. L'image finale obtenue après application du filtre est la résultante de la différence entre l'image originale et la couche de base.
+		
+		\subsection{Objectifs}
+%		Définir le sujet en quelques lignes~: s'il s'agit de faire ou d'améliorer un système\ldots et surtout la nature du système en question (est-ce un système d'information, un système dynamique i.e. à contraintes temps réel, un logiciel d'aide à la décision ou d'optimisation,\ldots). Expliquer également de quoi doit être constitué le système au niveau matériel et logiciel.
+
+\paragraph{}
+	On peut décomposer le projet en trois grandes parties. Tout d'abord, il faudra mettre en place une implémentation du filtre bilatéral en utilisant la méthode naïve. Avec cette implémentation, on pourra tester le filtre sur des images bruités puis effectuer une décomposition pyramidale multi-échelle à partir du filtre et manipuler les détails selon deux niveaux : l'atténuation ou le réhaussement des détails. 
+
+	Dans un second temps, une interface graphique sera mise en place permettant de manipuler les détails d'une image selon les deux niveaux vu précédemment. Par la suite, on cherchera à accélérer le traitement réaliser par le filtre bilatéral.
+	
+	Pour finir, la décomposition multi-échelle sera ré-implémenté selon une nouvelle méthode et l'image devra être manipulé à partir d'un graphe dont la structure devra être construite. Si le temps le permet, un travail sur les modèles 3D pourra être réaliser. 
+
+		
+		%\subsection{Hypothèses (selon les projets)}
+		%Les hypothèses décrivent tous les facteurs susceptibles de remettre en cause tout ou une partie de la réalisation des spécifications ainsi que d'éventuelles solutions de repli. Par exemple, <<~Si au cours du projet il se passe X, on fera Y, sinon on fera Z~>> ou encore <<~Si on n'arrive pas à faire X, ou si on ne trouve pas la librairie Y, on  fera Z~>>. Il faut bien détailler toutes les alternatives qui se posent en début de projet.
+		
+		\subsection{Bases méthodologiques (selon les projets)}
+%Elles précisent quelles procédures, méthodes, outils, normes, langages, règles de programmation devront être utilisés pour mener à bien le projet.
+
+\paragraph{}
+La manipulation des images devra se faire à l'aide de la librairie CImg \cite{cimg} et l'interface sera développée avec le framework Qt. Le projet devra être codé en C++. 
+
+	\section{Description générale}
+
+		\subsection{Environnement du projet}
+		\label{sec:envprojet}
+%Ce paragraphe situe le projet par rapport à l'environnement dont il dépend et par rapport à d'éventuels projets parallèles. On définira notamment l'environnement logiciel et matériel associé au projet ainsi que la façon dont celui-ci s'inscrit par rapport à l'existant. 
+%L'intégration du projet dans son environnement et \textbf{dans l'existant} ainsi que les interactions entre ces éléments peuvent être visualisées en utilisant un schéma d'intégration ou le formalisme d'une méthode d'analyse telle que celles présentées dans le cours de Génie Logiciel.
+
+\paragraph{}
+	Ce projet ne s'inscrit dans aucun existant. Le prototype logiciel ne nécessite aucune machine particulière n'ayant pas de contraintes logicielles ni matérielles pour l'utilisateur.  		
+
+
+		\subsection{Caractéristiques des utilisateurs}
+%Identifier les différents types d'utilisateurs du système. Pour chacun on devra préciser les caractéristiques qui affecteront l'interface utilisateur (menus, commandes textuelles,\ldots) :
+%\begin{itemize}
+%	\item connaissance ou non de l'informatique~;
+%	\item expérience de l'application~;
+%	\item utilisateurs réguliers et/ou occasionnels~;
+%	\item droits d'accès utilisateurs.
+%\end{itemize}
+
+\paragraph{}
+	Le système ne rencontrera qu'un unique type d'utilisateur celui du prototype logiciel. L'utilisateur du logiciel n'aura pas besoin d'avoir des connaissances informatiques afin d'utiliser celui-ci. L'interface sera la même pour tous les utilisateurs du logiciel, ils pourront donc tous effectuer les mêmes manipulations avec celui-ci.
+
+
+
+		\subsection{Fonctionnalités et structure générale du système}
+		\label{sec:foncgales}
+%Décrire les fonctions utilisateurs du système et les principaux objets qui constituent le système. Ceci peut être fait au travers d'un ou plusieurs diagrammes de cas d'utilisation généraux par type d'utilisateur, ainsi que par un diagramme statique (<<~objet~>> au sens large) qui est le pendant de la partie~\ref{sec:envprojet} (externe/interne).
+%RQ~: ces points seront détaillés par la suite (cf. parties~\ref{sec:archi} et~\ref{sec:fonctions})
+
+\paragraph{}
+	L'utilisateur pourra effectuer diverses actions avec le logiciel. Ces actions seront : 
+	\begin{itemize}
+		\item[$\bullet$] Charger une image
+		\item[$\bullet$] Choisir le niveaux de détails du filtre 
+		\item[$\bullet$] Introduire des informations (paramètres) manuellement
+		\item[$\bullet$] Sauvegarder l'image généré
+	\end{itemize}
+
+\begin{figure}[H]
+	\begin{center} 
+		\includegraphics[scale=0.5]{images/diagrammeDesCasUtilisation.png}
+	\end{center} 
+	\caption{Diagramme des cas d'utilisation du logiciel} 
+\end{figure} 
+
+
+		\subsection{Contraintes de développement}
+				
+			\subsubsection{Contraintes de développement}
+
+%Préciser les contraintes liées aux~:
+%\begin{itemize}
+%	\item matériels~: quelles sont les particularités du matériel qui vont contraindre le développement logiciel~;
+%	\item langages de programmation imposés ou adoptés~;
+%	\item logiciels de base à utiliser pour le développement~;
+%	\item environnements nécessaires~: simulateurs, outils logiciels~;
+%	\item algorithmes imposés~: ne pas hésiter à mettre en annexe les documents présentant ces algorithmes~;
+%	\item bibliothèques de programmes imposées~;
+%	\item protocoles de communication imposés~: si nécessaire mettre en annexe une présentation de ces protocoles de communication~;
+%	\item délais de réalisation~;
+%	\item etc.
+%\end{itemize}
+
+\paragraph{}
+	Le développement logiciel n'est contraint par aucune particularité lié au matériel. L'utilisation d'une librairie, CImg \index{CImg}, est requise afin de pouvoir manipuler les images et réaliser le filtre. L'interface graphique devra développée à l'aide du framework Qt.  Le choix du langage de programmation c'est naturellement porté vers le C++, la librairie CImg étant dans ce langage et le framwork Qt utilisable seulement dans ce langage également. 
+			
+%			\subsubsection{Contraintes d'exploitation (optionnel)}
+%Préciser les contraintes liées aux~:
+%\begin{itemize}
+%	\item règles de gestion du système~;
+%	\item affectations des responsabilités des utilisateurs~;
+%	\item planning d'exploitation~;
+%	\item problèmes de sauvegardes et de reprises (architecture minimale nécessaire à un fonctionnement dégradé)~;
+%	\item problèmes de sécurité et d'intégrité~;
+%	\item intervention d'une équipe système~;
+%	\item etc.
+%\end{itemize}
+
+%			\subsubsection{Maintenance et évolution du système (optionnel)}
+%Préciser les contraintes liées aux procédures de maintenance~:
+%\begin{itemize}
+%	\item curative ou corrective~;
+%	\item adaptative~;
+%	\item évolutive du système~;
+%	\item perfective.
+%\end{itemize}
+
+	\section{Description des interfaces externes du logiciel}
+
+		\subsection{Interfaces matériel/logiciel}
+%L'interface matériel/logiciel décrit précisément le matériel informatique et les périphériques, les procédures d'échange d'informations mis en jeu entre eux\ldots On notera donc ici les caractéristiques du matériel qui peuvent avoir une influence sur le logiciel, telles que~:
+%\begin{itemize}
+%	\item les normes de communication~: protocole d'échange et de raccordement (réseau local \ldots)~;
+%	\item type de liaison (série, parallèle, synchrone, asynchrone, \ldots)~;
+%	\item etc.
+%\end{itemize}
+
+\paragraph{}
+	Il n'y a pas d'interface matériel à considérer. 
+
+		\subsection{Interfaces homme/machine}
+%Il faut spécifier les points suivant~:
+%\begin{itemize}
+%	\item ergonomie du système~: caractéristiques des messages d'erreur, type de navigation dans le logiciel, etc.~;
+%	\item description des formes des éditions sur papier et écrans~;
+%	\item mode d'apprentissage de l'interface éventuellement~;
+%	\item niveau d'intelligence des interfaces H/M~;
+%	\item etc.
+%\end{itemize}
+%Des maquettes ou schémas décrivant ces interfaces ainsi que la charte graphique pourront être présentés ici.
+
+\paragraph{}
+L'interface homme/machine comporte deux écrans (voir image \ref{img:InterfaceChoix} et \ref{img:InterfaceFin}). Le premier écran permet de charger ou de sauvegarder une image via un panneau de navigation dans les dossiers de l'utilisateur. Cet écran est accessible par le bouton "navigation" dans les sections "Charger" et "Sauvegarder". 
+
+Une fois que l'utilisateur a choisi l'image qu'il veut manipuler, il peut cliquer sur le bouton "Charger", ce qui affichera l'image dans le cadre de gauche.
+
+\begin{figure}[H]
+	\begin{center} 
+		\includegraphics[scale=0.5]{images/ChargementImage.png}
+	\end{center} 
+	\caption{Interface pour choisir l'image initiale} 
+	\label{img:InterfaceChoix}
+\end{figure} 
+
+\paragraph{}
+L'utilisateur peut choisir la façon dont il souhaite manipuler l'image. Deux choix lui sont offert : 
+\begin{itemize}
+	\item[$\bullet$] Atténuation des détails
+	\item[$\bullet$] Rehaussement des détails
+\end{itemize}
+Il a la possibilité de rentrer manuellement des informations complémentaires dans la zone de texte prévu à cet effet. Afin de lancer l'exécution du filtre sur l'image, il doit appuyer sur le bouton "lancement". 
+
+\paragraph{}
+Une fois que le filtre a fini de s'exécuter sur l'image de base, celle-ci s'affiche dans le cadre de gauche et l'image résultante de la manipulation dans celui de droite. L'utilisateur pourra sauvegarder l'image résultante où il le souhaite via le bouton "navigation" puis avec le bouton "Sauvegarder". 
+
+\begin{figure}[H]
+	\begin{center} 
+		\includegraphics[scale=0.5]{images/Resultat.png}
+	\end{center} 
+	\caption{Interface après le lancement du filtre} 
+	\label{img:InterfaceFin}
+\end{figure} 
+
+		\subsection{Interfaces logiciel/logiciel}
+		
+%Il faut spécifier les points suivant~:
+%\begin{itemize}
+%	\item moyens d'accès à des systèmes de gestion de base de données, à des bibliothèques logicielles, description de la fréquence des accès, autorisations, etc.~;
+%	\item procédures de transferts d'information à distance (échanges d'informations par téléinformatique)~;
+%	\item procédures d'échange de messages entre application~;
+%	\item etc.
+%\end{itemize}
+
+Il n'y pas d'interfaces logiciel/logiciel à considérer.
+
+	\section{Architecture générale du système}
+	\label{sec:archi}
+%Identifier les principaux composants/éléments du système ainsi que leurs relations. Sans être une analyse à part entière, cette partie doit montrer que vous avez une première réflexion sur la structure interne de votre projet qui complètera la vision sommaire donnée en~\ref{sec:foncgales}. Un diagramme objet au sens large présentant les principales structures de données ainsi que les principaux composants du système pourra être fourni avec un ensemble de commentaires explicatifs.
+
+\paragraph{}
+Afin de modéliser notre problème qui est l'organisation de l'architecture de l'application avec une interface utilisateur, un design pattern Modèle-Vue-Contrôleur sera mis en place. Ce patron de conception va permettre de séparer les données (le modèle), l'interface utilisateur (la vue) et la logique de contrôle (le contrôleur). Le système sera donc composé de trois principaux éléments (voir le diagramme de classe \ref{img:DiagClasse}).
+\paragraph{} 
+Le composant \texttt{View} contiendra tous les attributs avec lequel l'utilisateur pourra interagir (boutons, zone de texte). Il permettra seulement d'afficher l'interface utilisateur et n'effectuera aucun traitement. Les actions des utilisateurs seront transmises au composant \texttt{Contrôlleur} qui réalisera l'action correspondante. Celui-ci aura pour rôle de gérer les messages transmis par la vue ainsi que la synchronisation entre la vue et le modèle (\texttt{ImgModel}). Le modèle est contenu dans le composant \texttt{ImgModel}. Il contiendra l'image et les méthodes nécessaire à sa manipulation.
+
+
+\begin{figure}[H]
+	\begin{center} 
+		\includegraphics[scale=0.7]{images/ClassDiagram2.png}
+	\end{center} 
+	\caption{Diagramme de classe du logicel} 
+	\label{img:DiagClasse}
+\end{figure} 
+
+
+
+
+	\section{Description des fonctionnalités}
+	\label{sec:fonctions}
+%Il s'agit de l'expression des besoins fonctionnels. Cette partie a donc comme objectif de décrire l'ensemble des fonctionnalités du système en précisant avec quels composants de la partie~\ref{sec:archi} elles interagissent. Des diagrammes de cas d'utilisation plus détaillés que ceux présentés en~\ref{sec:foncgales}, ainsi que l'arbre hiérarchique des fonctionnalités pourront être fournis ici pour donner une vision plus globale. En outre, chaque fonctionnalité sera décrite précisément (cf.ci-dessous). Là encore, il s'agit d'une pré-analyse indispensable à l'évaluation de la complexité de votre projet et à la planification de sa réalisation.
+
+		\subsection{Définition de la fonction \texttt{attenuation()}}
+		\label{SubSecAttenuation}
+
+			\subsubsection{Identification de la fonction \texttt{attenuation()}}
+Présenter la fonction~:
+\begin{itemize}
+	\item nom de la fonction : \texttt{attenuation};
+	\item rôle, présentation générale : cette fonction a pour rôle d'atténuer les détails de l'image;
+	\item priorité associée à la réalisation de la fonction : primordiale.
+\end{itemize}
+
+			\subsubsection{Description de la fonction \texttt{attenuation()}}
+%Décrire précisément~:
+%\begin{itemize}
+%	\item les entrées et les sorties ainsi que les préconditions et postconditions déjà connues, uniquement sous forme textuelle et en langue naturelle (pas dans un pseudo langage algorithmique). Si ces E/S sont connectées à d'autres fonction ou interfaces, le préciser également~;
+%	\item les composants avec lesquels cette fonction interagie (données/composants utilisés/modifiés, etc.~;
+%	\item le traitement associé à la fonction et à ses interfaces. Il peut s'agir d'une explication ou d'un pseudo-algorithme général précisant les différentes étapes du traitement. Lors de l'analyse, ce dernier pourra être précisément représenté par un diagramme d'activité~;
+%	\item si une gestion des erreurs spécifique (hors format des E/S) est prévue et comment celle-ci doit être mise en place si cela est déjà connu (notamment pour les fonctions sensibles).
+%\end{itemize}
+
+\paragraph{}
+La fonction utilisera l'attribut \texttt{img} de type \texttt{Cimg<double>} et le modifiera afin d'atténuer les détails de l'image. Afin de pouvoir atténuer les détails de l'image, il faudra au préalable appliquer dessus un filtre bilatéral puis ensuite décomposer le rendu de façon pyramidale qui permettra d'obtenir un ensemble de vecteurs comme sur l'image \ref{img:DecompoImg}.
+
+\begin{figure}[H]
+	\begin{center} 
+		\includegraphics[scale=0.5]{images/decompo.png}
+	\end{center} 
+	\caption{Vecteurs de la décomposition après un filtre bilatéral de l'image} 
+	\label{img:DecompoImg}
+\end{figure} 
+
+\paragraph{}
+L'atténuation se fait en utilisant un coefficient multiplicateur $\alpha$.
+
+\begin{align}
+	f = \sum_{i=0}^{n}{u_{i}} + v_{n} \\
+	T(f) = \sum_{i=0}^{n}{\alpha_{i}u_{i}} + v_{n}
+\end{align}
+	
+
+
+
+
+
+\paragraph{}
+Il n'y a pas de gestion des erreurs de prévues pour cette fonction. 
+
+
+		\subsection{Définition de la fonction \texttt{raising()}}
+
+			\subsubsection{Identification de la fonction \texttt{raising()}}
+%Présenter la fonction~:
+%\begin{itemize}
+%	\item nom de la fonction~;
+%	\item rôle, présentation générale~;
+%	\item priorité associée à la réalisation de la fonction (primordiale, secondaire, facultative).
+%\end{itemize}
+
+Présenter la fonction~:
+\begin{itemize}
+	\item nom de la fonction : \texttt{raising};
+	\item rôle, présentation générale : cette fonction a pour rôle de rehausser les détails de l'image;
+	\item priorité associée à la réalisation de la fonction : primordiale.
+\end{itemize}
+
+			\subsubsection{Description de la fonction \texttt{raising()}}
+\paragraph{}
+Cette fonction est similaire à celle d'atténuation (\ref{SubSecAttenuation}). Mais au contraire de celle-ci, elle a pour but rehausser les détails de l'image. Il faudra tout d'abord appliquer un filtre bilatéral à l'image puis décomposer ce rendu de façon pyramidale. Le résultat de la décomposition sera comme précédemment multiplié par un coefficient.
+
+
+	\section{Conditions de fonctionnement}
+%Il faut dans ce paragraphe décrire les dispositions qu'il est nécessaire de prendre en compte pour les différentes conditions de fonctionnement su systèmes.
+
+		\subsection{Performances}
+%Préciser en termes mesurables, les spécifications temps réel liées à l'utilisation du système~:
+%\begin{itemize}
+%	\item du point de vue de l'utilisateur : temps de réponse souhaité, fréquence d'utilisation, temps d'indisponibilité acceptable, etc.~;
+%	\item du point de vue de l'environnement : fréquence moyenne d'acquisition d'états ou de mesures, fréquence maximale d'E/S, etc.
+%\end{itemize}
+
+\paragraph{}
+Au moment de la réalisation de ce cahier, on ne peut pas encore chiffrer les performances attendues car c'est l'un des objectifs de ce projet. En effet, il faudra chercher par la suite à optimiser le code. Les modifications apportées à l'image devront se faire en un temps de l'ordre de la seconde, c'est à dire inférieur à une minute. Cette performance sera demandée sur des images de taille 256x256.
+
+
+		\subsection{Capacités}
+%Décrire les limites des problèmes traitables par le système et les limites des éventuelles extensions comme par exemple~:
+%\begin{itemize}
+%	\item nombre max de terminaux~;
+%	\item nombre max de points d'acquisition~;
+%	\item nombre max de transactions simultanées de tel type, etc.~;
+%	\item capacité max de stockage~;
+%	\item taille max des données traitées~;
+%	\item etc.
+%\end{itemize}
+
+\paragraph{}
+L'application pourra limiter la taille des images si celle-ci sont trop grosses car elle nécessiteront un temps de calcul trop important. Mais devra au minimum pourvoir fonctionner avec des images de taille 256x256.
+
+
+%			\subsection{Modes de fonctionnement (optionnel)}
+%Décrire les modes d'exploitation du système tels que~:
+%\begin{itemize}
+%	\item la mise sous tension~;
+%	\item l'arrêt~;
+%	\item la reprise de secours~;
+%	\item les modes dégradés~;
+%	\item etc.
+%\end{itemize}
+
+			\subsection{Contrôlabilité}
+%Il faut décrire, si elles existent, les spécifications particulières permettant de suivre l'exécution d'un traitement (fichier de log, niveaux d'affichages en mode debug, etc.)
+
+\paragraph{}
+L'exécution d'un traitement pourra être suivi au travers d'un fichier de log indiquant son avancement ainsi que la durée de celle-ci.
+
+
+%			\subsection{Sécurité}
+%Indiquer le niveau de confidentialité du système (contrôle d'accès des utilisateurs, mots clefs, mots de passe, etc.). Ceci est directement lié aux différents types d'utilisateurs (cf. 3.2).
+			
+%			\subsection{Intégrité (optionnel)}
+%Préciser les protections contre la déconnexion imprévue, les pertes d'information, etc. et quelles sont les procédures à suivre pour restaurer les données du système. Y-a-t-il des situations non protégées ?
+%
+%			\subsection{Conformité aux standards (optionnel)}
+%Les références aux standards ou normes (CCITT, ISO, AFNOR, \ldots) devront être notées.
+%
+%			\subsection{Facteurs de Qualité (optionnel)}
+%Il faut ici faire référence à un plan qualité du logiciel si nécessaire.
+
+\part*{Plan de développement}
+\addcontentsline{toc}{part}{Plan de développement} 
+\setcounter{chapter}{2}
+\setcounter{section}{0} % on remet la numérotation des sections à 1 (grâce au préfixe de partie qui est lui à 2)
+
+	\section{Découpage du projet en tâches}
+%Vous devez dans cette partie réfléchir à la structuration de votre projet en tâches. Une tâche correspond ici à un ensemble de réalisations ayant une cohésion d'ensemble. Il peut s'agir de composants ou de fonctionnalités du système tels qu'identifiés dans les sections~\ref{sec:archi} et~\ref{sec:fonctions} mais le plus souvent, les tâches sont transversales aux fonctions et/ou aux composants. Ainsi, selon le point de vue adopté, un composant pourra effectuer plusieurs fonctions, une fonction pourra travailler sur plusieurs composants, etc. De même, la réalisation des interfaces homme/machine peut faire l'objet de tâches à part entière (améliore leur indépendance et les rend plus facilement évolutive) ou encore peut être intégrée à la réalisation de chaque composant auquel elles se rapportent.
+%
+%Ces tâches ne sont pas nécessairement indépendantes les unes des autres même si cela facilite souvent leur identification et permet de répartir plus facilement les charges.
+%On indiquera également ici les tâches relatives à la gestion de projet (prise en mains de l'existant, bibliographie, rédaction du cahier de spécification, du rapport, de manuels techniques ou utilisateurs, mise en production et recette globale, etc.
+%Chaque tâche doit être décrite précisément~:
+
+			\subsection{Implémentation du filtre bilatéral}
+
+					\subsubsection{Description de la tâche}
+Dire en quoi consiste la tâche, quels sont les composants, parties ou fonctions du système qu'elle intègre, le degré de finalisation souhaité (version alpha, beta, etc.), etc. 
+
+					\subsubsection{Cycle de vie}
+S'il s'agit d'une tâche de développement, donner le cycle de vie associé pour préciser notamment si des phases de tests (unitaires, fonctionnels, d'intégration) et de recette sont prévus.
+
+					\subsubsection{Livrables}
+Si la tâche requiert un livrable (rapport plus ou moins court, livraison d'un composant logiciel, etc.), préciser ici sa nature et ce qu'il doit contenir ou faire apparaître.
+
+					\subsubsection{Estimation de charge}
+Estimation du temps en jour/homme nécessaire à la réalisation de la tâche.
+
+					\subsubsection{Contraintes temporelles}
+Indique si des contraintes de temps fortes existent pour la réalisation de la tâche.
+
+			\subsection{Utilisation du filtre bilatéral en décomposition}
+
+					\subsubsection{Description de la tâche}
+Dire en quoi consiste la tâche, quels sont les composants, parties ou fonctions du système qu'elle intègre, le degré de finalisation souhaité (version alpha, beta, etc.), etc. 
+
+					\subsubsection{Cycle de vie}
+S'il s'agit d'une tâche de développement, donner le cycle de vie associé pour préciser notamment si des phases de tests (unitaires, fonctionnels, d'intégration) et de recette sont prévus.
+
+					\subsubsection{Livrables}
+Si la tâche requiert un livrable (rapport plus ou moins court, livraison d'un composant logiciel, etc.), préciser ici sa nature et ce qu'il doit contenir ou faire apparaître.
+
+					\subsubsection{Estimation de charge}
+Estimation du temps en jour/homme nécessaire à la réalisation de la tâche.
+
+					\subsubsection{Contraintes temporelles}
+Indique si des contraintes de temps fortes existent pour la réalisation de la tâche.
+
+			\subsection{Pyramide multi-échelle à partir du filtre bilatéral}
+
+					\subsubsection{Description de la tâche}
+Dire en quoi consiste la tâche, quels sont les composants, parties ou fonctions du système qu'elle intègre, le degré de finalisation souhaité (version alpha, beta, etc.), etc. 
+
+					\subsubsection{Cycle de vie}
+S'il s'agit d'une tâche de développement, donner le cycle de vie associé pour préciser notamment si des phases de tests (unitaires, fonctionnels, d'intégration) et de recette sont prévus.
+
+					\subsubsection{Livrables}
+Si la tâche requiert un livrable (rapport plus ou moins court, livraison d'un composant logiciel, etc.), préciser ici sa nature et ce qu'il doit contenir ou faire apparaître.
+
+					\subsubsection{Estimation de charge}
+Estimation du temps en jour/homme nécessaire à la réalisation de la tâche.
+
+					\subsubsection{Contraintes temporelles}
+Indique si des contraintes de temps fortes existent pour la réalisation de la tâche.
+
+			\subsection{Manipulation des détails}
+
+					\subsubsection{Description de la tâche}
+Dire en quoi consiste la tâche, quels sont les composants, parties ou fonctions du système qu'elle intègre, le degré de finalisation souhaité (version alpha, beta, etc.), etc. 
+
+					\subsubsection{Cycle de vie}
+S'il s'agit d'une tâche de développement, donner le cycle de vie associé pour préciser notamment si des phases de tests (unitaires, fonctionnels, d'intégration) et de recette sont prévus.
+
+					\subsubsection{Livrables}
+Si la tâche requiert un livrable (rapport plus ou moins court, livraison d'un composant logiciel, etc.), préciser ici sa nature et ce qu'il doit contenir ou faire apparaître.
+
+					\subsubsection{Estimation de charge}
+Estimation du temps en jour/homme nécessaire à la réalisation de la tâche.
+
+					\subsubsection{Contraintes temporelles}
+Indique si des contraintes de temps fortes existent pour la réalisation de la tâche.
+
+			\subsection{Interface graphuique}
+
+					\subsubsection{Description de la tâche}
+Dire en quoi consiste la tâche, quels sont les composants, parties ou fonctions du système qu'elle intègre, le degré de finalisation souhaité (version alpha, beta, etc.), etc. 
+
+					\subsubsection{Cycle de vie}
+S'il s'agit d'une tâche de développement, donner le cycle de vie associé pour préciser notamment si des phases de tests (unitaires, fonctionnels, d'intégration) et de recette sont prévus.
+
+					\subsubsection{Livrables}
+Si la tâche requiert un livrable (rapport plus ou moins court, livraison d'un composant logiciel, etc.), préciser ici sa nature et ce qu'il doit contenir ou faire apparaître.
+
+					\subsubsection{Estimation de charge}
+Estimation du temps en jour/homme nécessaire à la réalisation de la tâche.
+
+					\subsubsection{Contraintes temporelles}
+Indique si des contraintes de temps fortes existent pour la réalisation de la tâche.
+
+			\subsection{Accélération}
+
+					\subsubsection{Description de la tâche}
+Dire en quoi consiste la tâche, quels sont les composants, parties ou fonctions du système qu'elle intègre, le degré de finalisation souhaité (version alpha, beta, etc.), etc. 
+
+					\subsubsection{Cycle de vie}
+S'il s'agit d'une tâche de développement, donner le cycle de vie associé pour préciser notamment si des phases de tests (unitaires, fonctionnels, d'intégration) et de recette sont prévus.
+
+					\subsubsection{Livrables}
+Si la tâche requiert un livrable (rapport plus ou moins court, livraison d'un composant logiciel, etc.), préciser ici sa nature et ce qu'il doit contenir ou faire apparaître.
+
+					\subsubsection{Estimation de charge}
+Estimation du temps en jour/homme nécessaire à la réalisation de la tâche.
+
+					\subsubsection{Contraintes temporelles}
+Indique si des contraintes de temps fortes existent pour la réalisation de la tâche.
+
+			\subsection{Modification de l'algorithme de décomposition}
+
+					\subsubsection{Description de la tâche}
+Dire en quoi consiste la tâche, quels sont les composants, parties ou fonctions du système qu'elle intègre, le degré de finalisation souhaité (version alpha, beta, etc.), etc. 
+
+					\subsubsection{Cycle de vie}
+S'il s'agit d'une tâche de développement, donner le cycle de vie associé pour préciser notamment si des phases de tests (unitaires, fonctionnels, d'intégration) et de recette sont prévus.
+
+					\subsubsection{Livrables}
+Si la tâche requiert un livrable (rapport plus ou moins court, livraison d'un composant logiciel, etc.), préciser ici sa nature et ce qu'il doit contenir ou faire apparaître.
+
+					\subsubsection{Estimation de charge}
+Estimation du temps en jour/homme nécessaire à la réalisation de la tâche.
+
+					\subsubsection{Contraintes temporelles}
+Indique si des contraintes de temps fortes existent pour la réalisation de la tâche.
+
+			\subsection{Travail sur les modèles 3D}
+
+					\subsubsection{Description de la tâche}
+Dire en quoi consiste la tâche, quels sont les composants, parties ou fonctions du système qu'elle intègre, le degré de finalisation souhaité (version alpha, beta, etc.), etc. 
+
+					\subsubsection{Cycle de vie}
+S'il s'agit d'une tâche de développement, donner le cycle de vie associé pour préciser notamment si des phases de tests (unitaires, fonctionnels, d'intégration) et de recette sont prévus.
+
+					\subsubsection{Livrables}
+Si la tâche requiert un livrable (rapport plus ou moins court, livraison d'un composant logiciel, etc.), préciser ici sa nature et ce qu'il doit contenir ou faire apparaître.
+
+					\subsubsection{Estimation de charge}
+Estimation du temps en jour/homme nécessaire à la réalisation de la tâche.
+
+					\subsubsection{Contraintes temporelles}
+Indique si des contraintes de temps fortes existent pour la réalisation de la tâche.
+
+		\section{Planning}
+Le planning (sous forme de diagramme de Gantt si possible) synthétise l'ordonnancement de chacune des tâches en faisant apparaître leur éventuelle parallélisation. Il indique également les dates clés de la réalisation du projet (soutenance, etc.) ainsi que les dates de remise des livrables.
+
+\annexes{Glossaire}
+
+	\chapter{Glossaire}
+Dans cette partie on doit trouver, classés par ordre alphabétique, les définitions des termes courants utilisés, des termes techniques, abréviation, sigles et symboles employés dans l'ensemble du document.
+
+	\chapter{Références}
+Cette dernière partie recense les références techniques sur le projet sur~:
+\begin{itemize}
+	\item les documents relatifs à l'existant et à l'environnement~;
+	\item les documents sur les méthodes et algorithmes cités~;
+	\item les documents bibliographiques (internes et externes)~;
+	\item les sources d'obtention des documents.
+\end{itemize}
+
+Utiliser les commandes \LaTeX adéquates.
+
+\bibliography{biblio}
+\bibliographystyle{unsrt}
+\addcontentsline{toc}{chapter}{Bibliographie}
+
+
+	\chapter{Index}
+	Cette partie indique les pages où sont traités et mentionnés les sujets et les termes les plus importants du document.
+	
+	Utiliser les commandes \LaTeX adéquates.
+
+\end{document}
+
