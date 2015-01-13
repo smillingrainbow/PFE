@@ -6,7 +6,7 @@ PARTIE I
 		- echantillonner
 		- récupérer les psnr
 	- Utilisation du FB en décomposition
-		- trouver les différentes valeurs de s 2 param (sigma S et R) pour faire des décompostions + ou - forte
+		- trouver les différentes valeurs des 2 param (sigma S et R) pour faire des décompostions + ou - forte
 	- Pyramide multi-échelle à partir du FB 
 		- lecture d'une partie de l'article
 		- implémentation d'une méthode
