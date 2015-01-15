@@ -38,7 +38,7 @@ CImg<double> FiltreBilateral::applyFilter()
 {
   //CImg<double> res(img);
   //return res;
-  // crée une image avec les mêmes caractéristiques que l'actuelle et rempli de 0
+  // crée une image avec les mêmes caractéristiques que l'actuelle et remplie de 0
   CImg<double> bfImg(width, height, img.depth(), img.spectrum(),0);
   double wp=0;
   int size = 21;
@@ -46,13 +46,17 @@ CImg<double> FiltreBilateral::applyFilter()
   double gauss=0;
   double distEuclidienne=0;
   double distScalaire=0;
+  double *value = new double[img.spectrum()];
+  double valueNormal=0;
   
   
   // parcours de l'image sur la longeur (y) et la largeur(x)
   cimg_forX(img, x){
     cimg_forY(img, y){
       wp=0;
-      
+      for(int i=0; i<img.spectrum(); i++){
+	value[i] = 0;
+      }
       // parcours d'un carré de 21x21 autour du pixel courant
       // délimitation des variables de parcours en fonction de la position du pixel
       if(x<(size/2)-1){
@@ -90,18 +94,20 @@ CImg<double> FiltreBilateral::applyFilter()
 	  
 	  distEuclidienne = distanceEuclidienne(x, y, iX, iY);
 	  distScalaire = distanceScalaire(x, y, iX, iY);
-	  gauss = loiGaussienne(distEuclidienne, fSigmaS) * 			loiGaussienne(distScalaire, fSigmaR); 
-	  for(int iColor=0; iColor<= img.spectrum(); iColor++){
-	     
-	    bfImg.set_linear_atXYZ(bfImg._atXYZC(x,y, 0, iColor)+(gauss*img._atXYZC(iX,iY, 0, iColor)), x, y, 0, iColor);
+	  gauss = loiGaussienne(distEuclidienne, fSigmaS) * 					loiGaussienne(distScalaire, fSigmaR); 
+	  
+	  for(int iColor=0; iColor< img.spectrum(); iColor++){
+	    value[iColor] += gauss*img._atXYZC(iX,iY, 0, iColor);
+	    bfImg.set_linear_atXYZ(value[iColor], x, y, 0, iColor, f);
 	    
 	    wp += gauss;
 	  }
 
 	}
       }
-      for(int iColor=0; iColor<= img.spectrum(); iColor++){
-	bfImg.set_linear_atXYZ(bfImg._atXYZC(x,y, 0 , iColor)/wp, x,y, 0, iColor);
+      for(int iColor=0; iColor< img.spectrum(); iColor++){
+	valueNormal = bfImg._atXYZC(x,y, 0 , iColor)/wp;
+	bfImg.set_linear_atXYZ(valueNormal, x,y, 0, iColor, false);
       }
     }
   }
@@ -114,7 +120,7 @@ CImg<double> FiltreBilateral::applyFilter()
  */
 double FiltreBilateral::loiGaussienne(double value, float sigma){
 
-  double gauss = (1/(2*M_PI* pow(sigma,2))) * exp((-pow(value,2))/(2*pow(sigma,2)));
+  double gauss = (1/(2*M_PI* pow(sigma,2))) * exp(-(pow(value,2))/(2*pow(sigma,2)));
   
   return gauss;
 }

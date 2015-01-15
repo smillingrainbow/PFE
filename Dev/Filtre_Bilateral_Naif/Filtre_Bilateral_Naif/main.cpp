@@ -29,6 +29,8 @@ CImg<double> filtre_bilateral(CImg<double> img, string nomImg, float fsigmaS, fl
   // FILTRE BILATERAL
   FiltreBilateral fb(fsigmaS, fsigmaR, img);
   cout<< "Filtre bilatéral : début" << endl;
+  cout << "Sigma s : " << fsigmaS << endl;
+  cout << "Sigma r : " << fsigmaR << endl;
   start = clock();
   CImg<double> fbImg = fb.applyFilter();
   temps = (double)(clock()-start)/(double) CLOCKS_PER_SEC;
@@ -120,25 +122,34 @@ int main(int argc, char **argv) {
     cout<<"Veuillez saisir le nom de l'image avec son extension (ex: lena.jpg)" << endl;
     cin>> nomImg; 
     
-    cout<<"Veuillez saisir la valeur de sigma S (en pourcentage)."<< endl;
+    cout<<"Veuillez saisir la valeur de sigma S."<< endl;
     cin>> fsigmaS;
     
     cout<<"Veuillez saisir la valeur de sigma R (en pourcentage)."<< endl;
-    cin>> fsigmaR;
-    
-    fsigmaS = fsigmaS/100;
-    fsigmaR = fsigmaR/100;
-    
+    cin>> fsigmaR;  
   }
   
   CImg<double> img(nomImg.c_str());
+  CImg<double> noiseGauss(img);
+  noiseGauss.noise(10);
+  CImg<double> fbImg = filtre_bilateral(noiseGauss, nomImg, fsigmaS, fsigmaR);
+    
+//   CImg<double> fbImg = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
   
-  CImg<double> fbImg = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
-  
+  CImg<double> imgTest(noiseGauss);
+  imgTest = imgTest.blur_bilateral(imgTest, fsigmaS, fsigmaR);
   CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
-  
+  CImgDisplay windows_fbTest(imgTest, "Image filtre bilateral CImg");
   CImgDisplay main(img, "Normal");
   
+  if(imgTest == fbImg){
+    cout<< "Image identique" <<endl;
+  }
+  else{
+    cout<<"Image différente" << endl;
+  }
+  
+  cout << "PSNR : " << noiseGauss.PSNR(fbImg) << endl;
 
   while(!main.is_closed()){
     main.wait();
