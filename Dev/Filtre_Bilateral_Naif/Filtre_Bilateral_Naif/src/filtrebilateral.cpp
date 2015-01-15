@@ -98,7 +98,7 @@ CImg<double> FiltreBilateral::applyFilter()
 	  
 	  for(int iColor=0; iColor< img.spectrum(); iColor++){
 	    value[iColor] += gauss*img._atXYZC(iX,iY, 0, iColor);
-	    bfImg.set_linear_atXYZ(value[iColor], x, y, 0, iColor, f);
+	    bfImg.set_linear_atXYZ(value[iColor], x, y, 0, iColor, false);
 	    
 	    wp += gauss;
 	  }
