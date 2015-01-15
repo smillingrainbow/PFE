@@ -1,0 +1,210 @@
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.1
+	Sigma R : 0.1
+Tenmps d'éxécution : 4.34905secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.1_sigmaR_0.1_test.png
+----------------------------
+Nom de l'image : test1.png
+Paramètre : 
+	Sigma S : 0.1
+	Sigma R : 0.1
+Tenmps d'éxécution : 4.35885secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.1_sigmaR_0.1_test1.png
+----------------------------
+Nom de l'image : lena.jpg
+Paramètre : 
+	Sigma S : 0.1
+	Sigma R : 0.1
+Tenmps d'éxécution : 17.2846secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.1_sigmaR_0.1_lena.jpg
+----------------------------
+Nom de l'image : lena.jpg
+Paramètre : 
+	Sigma S : 0.1
+	Sigma R : 0.1
+Tenmps d'éxécution : 17.4319secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.1_sigmaR_0.1_lena.jpg
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.1
+	Sigma R : 0.2
+Tenmps d'éxécution : 4.46241secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.1_sigmaR_0.2_test.png
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.2
+Tenmps d'éxécution : 27.3789secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.2_IM088.tif
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.3
+	Sigma R : 0.5
+Tenmps d'éxécution : 5.53331secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.3_sigmaR_0.5_test.png
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.3
+	Sigma R : 0.6
+Tenmps d'éxécution : 5.58707secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.3_sigmaR_0.6_test.png
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.5
+Tenmps d'éxécution : 5.75595secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.5_test.png
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.3
+Tenmps d'éxécution : 30.3214secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.3_IM088.tif
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.3
+	Sigma R : 0.6
+Tenmps d'éxécution : 32.2137secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.3_sigmaR_0.6_IM088.tif
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.3
+	Sigma R : 0.4
+Tenmps d'éxécution : 6.27679secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.3_sigmaR_0.4_test.png
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.3
+Tenmps d'éxécution : 21.316secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.3_test.png
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.3
+Tenmps d'éxécution : 112.054secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.3_IM088.tif
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.1
+	Sigma R : 0.1
+Tenmps d'éxécution : 71.2325secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.1_sigmaR_0.1_test.png
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.5
+	Sigma R : 0.6
+Tenmps d'éxécution : 76.5411secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.5_sigmaR_0.6_IM088.tif
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.3
+Tenmps d'éxécution : 91.5526secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.3_test.png
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.3
+Tenmps d'éxécution : 92.3902secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.3_test.png
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.4
+	Sigma R : 0.6
+Tenmps d'éxécution : 50.6753secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.4_sigmaR_0.6_IM088.tif
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.4
+	Sigma R : 0.6
+Tenmps d'éxécution : 51.6109secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.4_sigmaR_0.6_IM088.tif
+----------------------------
+Nom de l'image : IM150.tif
+Paramètre : 
+	Sigma S : 0.4
+	Sigma R : 0.5
+Tenmps d'éxécution : 497.903secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.4_sigmaR_0.5_IM150.tif
+----------------------------
+Nom de l'image : lena.jpg
+Paramètre : 
+	Sigma S : 0.5
+	Sigma R : 0.3
+Tenmps d'éxécution : 340.337secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.5_sigmaR_0.3_lena.jpg
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.3
+	Sigma R : 0.3
+Tenmps d'éxécution : 50.2108secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.3_sigmaR_0.3_IM088.tif
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.5
+	Sigma R : 0.1
+Tenmps d'éxécution : 38.3659secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.5_sigmaR_0.1_IM088.tif
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.2
+Tenmps d'éxécution : 39.7272secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.2_IM088.tif
+----------------------------
+Nom de l'image : lena.jpg
+Paramètre : 
+	Sigma S : 0.5
+	Sigma R : 0.5
+Tenmps d'éxécution : 233.611secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.5_sigmaR_0.5_lena.jpg
+----------------------------
+Nom de l'image : lena.jpg
+Paramètre : 
+	Sigma S : 0.7
+	Sigma R : 0.9
+Tenmps d'éxécution : 234.573secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.7_sigmaR_0.9_lena.jpg
+----------------------------
+Nom de l'image : lena.jpg
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.4
+Tenmps d'éxécution : 235.892secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.4_lena.jpg
+----------------------------
+Nom de l'image : test.png
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.4
+Tenmps d'éxécution : 65.4965secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.4_test.png
+----------------------------
+Nom de l'image : IM150.tif
+Paramètre : 
+	Sigma S : 0.2
+	Sigma R : 0.4
+Tenmps d'éxécution : 341.958secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_0.2_sigmaR_0.4_IM150.tif
+----------------------------
