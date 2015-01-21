@@ -241,7 +241,7 @@ CImg< double > FiltreBilateral::applyFilterV2()
 {
   CImg<double> bfImg(width, height, img.depth(), img.spectrum(),0);
   double wp=0;
-  int size = 51;
+  int size = 21;
   int iXdebut=0, iYdebut=0, iXfin=0, iYfin=0;
   double gauss=0;
   double distEuclidienne=0;

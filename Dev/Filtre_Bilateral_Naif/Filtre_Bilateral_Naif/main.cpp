@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
   CImg<double> img(nomImg.c_str());
   CImg<double> noiseGauss(img);
   noiseGauss.noise(10);
-  
+  cout<< "Nombre de canaux : " << img.spectrum() << endl;
   CImg<double> fbImg = filtre_bilateral(noiseGauss, nomImg, fsigmaS, fsigmaR);
     
 //   CImg<double> fbImg = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
