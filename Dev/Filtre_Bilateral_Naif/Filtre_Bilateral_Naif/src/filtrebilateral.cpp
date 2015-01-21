@@ -47,15 +47,15 @@ CImg<double> FiltreBilateral::applyFilter()
   double distEuclidienne=0;
   double distScalaire=0;
   double *value = new double[img.spectrum()];
-  double valueNormal=0;
+  double valueNormal=0.0;
   
   
   // parcours de l'image sur la longeur (y) et la largeur(x)
-  cimg_forX(img, x){
+  cimg_forX(img, x){                                                                                                                         
     cimg_forY(img, y){
       wp=0;
-      for(int i=0; i<img.spectrum(); i++){
-	value[i] = 0;
+      cimg_forC(img, c){
+	value[c] = 0.0;
       }
       // parcours d'un carré de 21x21 autour du pixel courant
       // délimitation des variables de parcours en fonction de la position du pixel
@@ -96,18 +96,18 @@ CImg<double> FiltreBilateral::applyFilter()
 	  distScalaire = distanceScalaire(x, y, iX, iY);
 	  gauss = loiGaussienne(distEuclidienne, fSigmaS) * 					loiGaussienne(distScalaire, fSigmaR); 
 	  
-	  for(int iColor=0; iColor< img.spectrum(); iColor++){
-	    value[iColor] += gauss*img._atXYZC(iX,iY, 0, iColor);
-	    bfImg.set_linear_atXYZ(value[iColor], x, y, 0, iColor, false);
+	  cimg_forC(img, c){
+	    value[c] += gauss*img._atXYZC(iX,iY, 0, c);
+	    bfImg.set_linear_atXYZ(value[c], x, y, 0, c, false);
 	    
 	    wp += gauss;
 	  }
 
 	}
       }
-      for(int iColor=0; iColor< img.spectrum(); iColor++){
-	valueNormal = bfImg._atXYZC(x,y, 0 , iColor)/wp;
-	bfImg.set_linear_atXYZ(valueNormal, x,y, 0, iColor, false);
+      cimg_forC(img, c){
+	valueNormal = bfImg._atXYZC(x,y, 0 , c)/wp;
+	bfImg.set_linear_atXYZ(valueNormal, x,y, 0, c, false);
       }
     }
   }
@@ -234,6 +234,80 @@ double FiltreBilateral::transformationBoxMuller(float sigma){
   }
   
   return res;
+}
+
+
+CImg< double > FiltreBilateral::applyFilterV2()
+{
+  CImg<double> bfImg(width, height, img.depth(), img.spectrum(),0);
+  double wp=0;
+  int size = 51;
+  int iXdebut=0, iYdebut=0, iXfin=0, iYfin=0;
+  double gauss=0;
+  double distEuclidienne=0;
+  double *value = new double[img.spectrum()];
+  double valueNormal=0.0;
+  
+  cimg_forC(img, c){
+    // parcours de l'image sur la longeur (y) et la largeur(x)
+    cimg_forX(img, x){                                                                                                                         
+      cimg_forY(img, y){
+	wp=0;
+	cimg_forC(img, c){
+	  value[c] = 0.0;
+	}
+	// parcours d'un carré de 21x21 autour du pixel courant
+	// délimitation des variables de parcours en fonction de la position du pixel
+	if(x<(size/2)-1){
+	  iXdebut= 0;
+	}
+	else{
+	  iXdebut = x - (size/2);
+	}
+	if(y < (size/2)-1){
+	  iYdebut = 0;
+	}
+	else{
+	  iYdebut =  y - (size/2);
+	}
+	
+	if(x+(size/2) > width){
+	  iXfin = width-1;
+	}
+	else{
+	  iXfin = x + (size/2);
+	}
+	
+	if(y+(size/2) > height){
+	  iYfin = height-1;
+	}
+	else{
+	  iYfin = y + (size/2);
+	}
+	
+	// parcours sur la largeur 
+	for(int iX=iXdebut; iX<=iXfin; iX++){
+	  
+	  // parcours sur la longueur
+	  for(int iY=iYdebut; iY<=iYfin; iY++){
+	    
+	    distEuclidienne = distanceEuclidienne(x, y, iX, iY);
+	    gauss = loiGaussienne(distEuclidienne, fSigmaS) * 					loiGaussienne(std::abs(img._atXYZC(x,y,0,c) - img._atXYZC(iX,iY,0,c)), fSigmaR); 
+	    
+	    value[c] += gauss*img._atXYZC(iX,iY, 0, c);
+	    bfImg.set_linear_atXYZ(value[c], x, y, 0, c, false);
+	    
+	    wp += gauss;
+	    
+	  }
+	}
+	  valueNormal = bfImg._atXYZC(x,y, 0 , c)/wp;
+	  bfImg.set_linear_atXYZ(valueNormal, x,y, 0, c, false);
+      }
+    }
+  }
+  return bfImg;
+  
 }
 
 
