@@ -251,11 +251,16 @@ int main(int argc, char **argv) {
 
 		
 	
-	CImg<double> recompo = decomposition_Method1(img, fsigmaS, fsigmaR, 3);
+	CImg<double> recompo = decomposition_Method1(img, fsigmaS, fsigmaR, 5);
 	CImgDisplay recompoD(recompo, "Recomposition methode 1");
-	CImg<double> recompo2 = decomposition_Method2(img, fsigmaS, fsigmaR, 3);
+	string nomImgSave = "filtrebilateral_pyramide_methode1_" + nomImg ;   
+	CImg<double>(recompo.get_cut(0,255)).save(nomImgSave.c_str());
+	
+	CImg<double> recompo2 = decomposition_Method2(img, fsigmaS, fsigmaR, 5);
 	CImgDisplay recompoD2(recompo2, "Recomposition methode 2");
-
+	nomImgSave = "filtrebilateral_pyramide_methode2_" + nomImg ;   
+	CImg<double>(recompo2.get_cut(0,255)).save(nomImgSave.c_str());
+	
 	CImgDisplay main(img, "Normal");
 	
 // 	cout << "Valeur de diff max : " << comparaisonImageMax(fbImg, imgTest) << endl;
