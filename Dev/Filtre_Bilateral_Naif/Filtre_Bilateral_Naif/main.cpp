@@ -78,7 +78,7 @@ CImg<double> filtre_bilateralV2(CImg<double> img, float fsigmaS, float fsigmaR){
 	cout<< "Temps d'éxécution : " << temps  << " secondes" << endl;
 	cout<< "Filtre bilatéral : done" << endl;
 	
-	return fbImg;
+	return CImg<double> (fbImg.get_cut(0, 255));
 }
 
 CImg<double> filtre_moyen(CImg<double> img){
@@ -153,7 +153,6 @@ double comparaisonEntreImage(const CImg<double> &imgFb, const CImg<double> &imgC
 }
 
 
-
 int main(int argc, char **argv) {
 	
 	string nomImg;
@@ -178,60 +177,30 @@ int main(int argc, char **argv) {
 	}
 	
 	CImg<double> img(nomImg.c_str());
-// 	CImg<double> noiseGauss(img);
-// 	noiseGauss.noise(10);
+	CImg<double> noiseGauss(img);
+	noiseGauss.noise(10);
 	
-// 	CImg<double> fbImg = filtre_bilateral(noiseGauss, nomImg, fsigmaS, fsigmaR);
+	CImg<double> fbImg = filtre_bilateral(noiseGauss, nomImg, fsigmaS, fsigmaR);
 	
 // 	CImg<double> fbImg = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
-
-// 	CImg<double> imgTest(noiseGauss);
+// 	CImg<double> fbImg = filtre_bilateralV2(img, fsigmaS, fsigmaR);
+	
+	CImg<double> imgTest(noiseGauss);
 // 	CImg<double> imgTest(img);
-// 	imgTest = imgTest.blur_bilateral(imgTest, fsigmaS, fsigmaR);
+	imgTest = imgTest.blur_bilateral(imgTest, fsigmaS, fsigmaR);
 
-	CImg<double> base = filtre_bilateralV2(img, fsigmaS, fsigmaR);
-	CImg<double> baseImg = CImg<double> (base.get_cut(0,255));
-	CImg<double> detail = img - baseImg;
 	
-	CImg<double> detailImg = CImg<double> (detail.get_cut(0,255));
-	
-	string sigmaS =  to_string(fsigmaS);
-	string sigmaR = to_string(fsigmaR);
-	string nomImgDetailSave = "filtrebilateral_Detail_sigmaS_" + sigmaS + "_sigmaR_" + sigmaR + "_" + nomImg ; 
-	CImg<double>(detailImg).save(nomImgDetailSave.c_str());
-	
-// 	fsigmaS = fsigmaS/2;
-	fsigmaR = fsigmaR/2;
-	
-	CImg<double> base2 = filtre_bilateralV2(detailImg, fsigmaS, fsigmaR);
-	
-	sigmaS =  to_string(fsigmaS);
-	sigmaR = to_string(fsigmaR);
-	
-	string nomImgResSave = "filtrebilateral_V1_sigmaS_" + sigmaS + "_sigmaR_" + sigmaR + "_" + nomImg ;
-	
-	CImg<double>(base2.get_cut(0,255)).save(nomImgResSave.c_str());
+	CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
+	CImgDisplay windows_fbTest(imgTest, "Image filtre bilateral CImg");
 
-	CImg<double> recompo = detailImg + baseImg;
-	CImg<double> base2Img = CImg<double> (base2.get_cut(0,255));
-	CImg<double> detail2 = baseImg - detailImg;
-	CImg<double> recompo2= baseImg + detailImg + detail2; 
-	
-	
-// 	CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
-// 	CImgDisplay windows_fbTest(imgTest, "Image filtre bilateral CImg");
-	CImgDisplay basedDisplay(baseImg, "Base Layer");
-	CImgDisplay detailDisplay(detailImg, "Detail Layer");
-	CImgDisplay detail2Display(detail2, "Detail Layer 2");
-	CImgDisplay decompo(base2, "Base Layer 2");
-	CImgDisplay recompoDisplay(recompo, "Recomposition input");
-	CImgDisplay recompo2Display(recompo2, "Recomposition input 2");
+
+
 	CImgDisplay main(img, "Normal");
 	
-// 	cout << "Valeur de diff max : " << comparaisonImageMax(fbImg, imgTest) << endl;
-// 	cout << "Valeur de diff : " << comparaisonEntreImage(fbImg, imgTest) << endl;
-// 	
-// 	cout << "PSNR : " << noiseGauss.PSNR(fbImg) << endl;
+	cout << "Valeur de diff max : " << comparaisonImageMax(fbImg, imgTest) << endl;
+	cout << "Valeur de diff : " << comparaisonEntreImage(fbImg, imgTest) << endl;
+	
+	cout << "PSNR : " << noiseGauss.PSNR(fbImg) << endl;
 	 
 	while(!main.is_closed()){
 		main.wait();
