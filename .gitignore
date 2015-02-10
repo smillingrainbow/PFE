@@ -7,5 +7,6 @@ Dev/Test/
 *.log
 *.lof
 *.synctex.gz
-*.toc*.out
-.kdev4
+*.toc
+*.out
+*.kdev4
