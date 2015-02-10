@@ -8,3 +8,4 @@ Dev/Test/
 *.lof
 *.synctex.gz
 *.toc*.out
+.kdev4
