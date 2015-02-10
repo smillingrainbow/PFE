@@ -152,7 +152,7 @@ double comparaisonEntreImage(const CImg<double> &imgFb, const CImg<double> &imgC
 	return diff;
 }
 
-CImg<double> decomposition_Method1(const CImg<double>& imgOri, float fsigmaS, float fsigmaR, int k){
+CImg<double> decomposition_Method1(const CImg<double>& imgOri, string nomImg, float fsigmaS, float fsigmaR, int k){
 	
 	cout<< "--------------------------------------------" << endl;
 	cout << " Methode 1 " << endl;
@@ -169,8 +169,15 @@ CImg<double> decomposition_Method1(const CImg<double>& imgOri, float fsigmaS, fl
 		base.insert(filtre_bilateralV2(imgOri, fsigmaS, fsigmaR), i+1);
 		detail.insert(base(i) - base(i+1), i);
 		gImg += detail(i);
-		fsigmaR /= 3;
-// 		fsigmaS /=2;
+		string sigmaS =  to_string(fsigmaS);
+		string sigmaR = to_string(fsigmaR);
+		string it = to_string(i+1);
+		string nomImgSave = "pyramide_methode1_base_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;   
+		CImg<double>(base[i+1].get_cut(0,255)).save(nomImgSave.c_str());
+		nomImgSave = "pyramide_methode1_detail_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;  
+		CImg<double>(detail[i].get_cut(0,255)).save(nomImgSave.c_str());
+		fsigmaR /= 2;
+// 		fsigmaS *=2;
 	}
  	
  	gImg += base(k);
@@ -180,7 +187,7 @@ CImg<double> decomposition_Method1(const CImg<double>& imgOri, float fsigmaS, fl
 	return gImg;
 }
 
-CImg<double> decomposition_Method2(const CImg<double>& imgOri, float fsigmaS, float fsigmaR, int k){
+CImg<double> decomposition_Method2(const CImg<double>& imgOri, string nomImg, float fsigmaS, float fsigmaR, int k){
 	
 	cout<< "--------------------------------------------" << endl;
 	cout << " Methode 2 " << endl;
@@ -197,8 +204,15 @@ CImg<double> decomposition_Method2(const CImg<double>& imgOri, float fsigmaS, fl
 		base.insert(filtre_bilateralV2(base(i), fsigmaS, fsigmaR), i+1);
 		detail.insert(base(i) - base(i+1), i);
 		gImg += detail(i);
-		fsigmaR /= 3;
-// 		fsigmaS /=2;
+		string sigmaS =  to_string(fsigmaS);
+		string sigmaR = to_string(fsigmaR);
+		string it = to_string(i+1);
+		string nomImgSave = "pyramide_methode2_base_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;   
+		CImg<double>(base[i+1].get_cut(0,255)).save(nomImgSave.c_str());
+		nomImgSave = "pyramide_methode2_detail_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;  
+		CImg<double>(detail[i].get_cut(0,255)).save(nomImgSave.c_str());
+		fsigmaR /= 2;
+// 		fsigmaS *=2;
 	}
 	gImg += base(k);
 	cout << "-----------------------------------------" << endl;
@@ -251,12 +265,12 @@ int main(int argc, char **argv) {
 
 		
 	
-	CImg<double> recompo = decomposition_Method1(img, fsigmaS, fsigmaR, 5);
+	CImg<double> recompo = decomposition_Method1(img, nomImg,fsigmaS, fsigmaR, 3);
 	CImgDisplay recompoD(recompo, "Recomposition methode 1");
 	string nomImgSave = "filtrebilateral_pyramide_methode1_" + nomImg ;   
 	CImg<double>(recompo.get_cut(0,255)).save(nomImgSave.c_str());
 	
-	CImg<double> recompo2 = decomposition_Method2(img, fsigmaS, fsigmaR, 5);
+	CImg<double> recompo2 = decomposition_Method2(img, nomImg,fsigmaS, fsigmaR, 3);
 	CImgDisplay recompoD2(recompo2, "Recomposition methode 2");
 	nomImgSave = "filtrebilateral_pyramide_methode2_" + nomImg ;   
 	CImg<double>(recompo2.get_cut(0,255)).save(nomImgSave.c_str());
