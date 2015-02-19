@@ -1,7 +1,7 @@
 CC=clang++
 # CC=g++
 LIBS=-lreadline -lpthread -lm -lX11
-EXEC=filtre_bilateral_pyramide
+EXEC=filtre_bilateral_detail
 CCFLAGS= -g -Wall -Wextra -pedantic 
 
 BIN_DIR=bin

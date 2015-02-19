@@ -10,6 +10,11 @@
 using namespace cimg_library;
 using namespace std;
 
+float facteur_base = 5;
+float facteur_detail = 1;
+bool decrease = false;
+
+
 template <typename T>
 inline std::string to_string (const T& t)
 {
@@ -59,7 +64,6 @@ CImg<double> filtre_bilateral(CImg<double> img, string nomImg, float fsigmaS, fl
 	}
 	return fbImg;
 }
-
 
 CImg<double> filtre_bilateralV2(CImg<double> img, float fsigmaS, float fsigmaR){
 	
@@ -152,7 +156,7 @@ double comparaisonEntreImage(const CImg<double> &imgFb, const CImg<double> &imgC
 	return diff;
 }
 
-CImg<double> decomposition_Method1(const CImg<double>& imgOri, string nomImg, float fsigmaS, float fsigmaR, int k){
+CImg<double> decomposition_Method1_Increase(const CImg<double>& imgOri, string nomImg, float fsigmaS, float fsigmaR, int k){
 	
 	cout<< "--------------------------------------------" << endl;
 	cout << " Methode 1 " << endl;
@@ -168,26 +172,32 @@ CImg<double> decomposition_Method1(const CImg<double>& imgOri, string nomImg, fl
 		cout<< "Itération : " << i << endl;
 		base.insert(filtre_bilateralV2(imgOri, fsigmaS, fsigmaR), i+1);
 		detail.insert(base(i) - base(i+1), i);
-		gImg += detail(i);
+// 		gImg += (facteur_detail*detail(i));
+// 		gImg += (pow(1.2, i)-0.5)*detail(i);
+		gImg += (facteur_detail*(i+1) *detail(i));
+		
 		string sigmaS =  to_string(fsigmaS);
 		string sigmaR = to_string(fsigmaR);
 		string it = to_string(i+1);
+		
 		string nomImgSave = "pyramide_methode1_base_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;   
 		CImg<double>(base[i+1].get_cut(0,255)).save(nomImgSave.c_str());
+		
 		nomImgSave = "pyramide_methode1_detail_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;  
 		CImg<double>(detail[i].get_cut(0,255)).save(nomImgSave.c_str());
-		fsigmaR /= 2;
 // 		fsigmaS *=2;
+		fsigmaR *= 2;
 	}
  	
- 	gImg += base(k);
-	
+ 	gImg += (facteur_base*base(k));
+//  	gImg += base(k);
 	cout << "-----------------------------------------" << endl;
-	
+	string nomImgSave = "filtrebilateral_increase_methode1_" + nomImg ;   
+	CImg<double>(gImg.get_cut(0,255)).save(nomImgSave.c_str());
 	return gImg;
 }
 
-CImg<double> decomposition_Method2(const CImg<double>& imgOri, string nomImg, float fsigmaS, float fsigmaR, int k){
+CImg<double> decomposition_Method2_Increase(const CImg<double>& imgOri, string nomImg, float fsigmaS, float fsigmaR, int k){
 	
 	cout<< "--------------------------------------------" << endl;
 	cout << " Methode 2 " << endl;
@@ -203,7 +213,87 @@ CImg<double> decomposition_Method2(const CImg<double>& imgOri, string nomImg, fl
 		cout<< "Itération : " << i << endl;
 		base.insert(filtre_bilateralV2(base(i), fsigmaS, fsigmaR), i+1);
 		detail.insert(base(i) - base(i+1), i);
-		gImg += detail(i);
+// 		gImg += (facteur_detail*detail(i));
+// 		gImg += (pow(1.2, i)-0.5)*detail(i);
+		gImg += (facteur_detail*(i+1) *detail(i));
+		
+		string sigmaS =  to_string(fsigmaS);
+		string sigmaR = to_string(fsigmaR);
+		string it = to_string(i+1);
+		string nomImgSave = "pyramide_methode2_base_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;   
+		CImg<double>(base[i+1].get_cut(0,255)).save(nomImgSave.c_str());
+		nomImgSave = "pyramide_methode2_detail_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;  
+		CImg<double>(detail[i].get_cut(0,255)).save(nomImgSave.c_str());
+// 		fsigmaS *=2;
+		fsigmaR *= 2;
+	}
+	gImg += (facteur_base*base(k));
+// 	gImg += base(k);
+	
+	cout << "-----------------------------------------" << endl;
+	string nomImgSave = "filtrebilateral_increase_methode2_" + nomImg ;   
+	CImg<double>(gImg.get_cut(0,255)).save(nomImgSave.c_str());
+	return gImg;
+}
+CImg<double> decomposition_Method1_Decrease(const CImg<double>& imgOri, string nomImg, float fsigmaS, float fsigmaR, int k){
+	
+	cout<< "--------------------------------------------" << endl;
+	cout << " Methode 1 " << endl;
+	cout << "Nombre d'itération : " << k << endl;
+	
+	CImg<double> gImg(imgOri.width(), imgOri.height(), imgOri.depth(), imgOri.spectrum(),0);
+		
+	CImgList<double> base(k+1);
+	base.insert(imgOri, 0);
+	CImgList<double> detail(k);
+	
+	for(int i=0; i<k; i++){
+		cout<< "Itération : " << i << endl;
+		base.insert(filtre_bilateralV2(imgOri, fsigmaS, fsigmaR), i+1);
+		detail.insert(base(i) - base(i+1), i);
+// 		gImg += (facteur_detail*detail(i));
+// 		gImg += (pow(1.2, i)-0.5)*detail(i);
+		gImg += (facteur_detail*(i+1) *detail(i));
+		
+		string sigmaS =  to_string(fsigmaS);
+		string sigmaR = to_string(fsigmaR);
+		string it = to_string(i+1);
+		string nomImgSave = "pyramide_methode1_base_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;   
+		CImg<double>(base[i+1].get_cut(0,255)).save(nomImgSave.c_str());
+		nomImgSave = "pyramide_methode1_detail_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;  
+		CImg<double>(detail[i].get_cut(0,255)).save(nomImgSave.c_str());
+		fsigmaR /= 2;
+	}
+ 	
+	gImg += (facteur_base*base(k));
+// 	gImg += base(k);
+	
+	cout << "-----------------------------------------" << endl;
+	string nomImgSave = "filtrebilateral_decrease_methode1_" + nomImg ;   
+	CImg<double>(gImg.get_cut(0,255)).save(nomImgSave.c_str());
+	return gImg;
+}
+
+CImg<double> decomposition_Method2_Decrease(const CImg<double>& imgOri, string nomImg, float fsigmaS, float fsigmaR, int k){
+	
+	cout<< "--------------------------------------------" << endl;
+	cout << " Methode 2 " << endl;
+	cout << "Nombre d'itération : " << k << endl;
+	
+	CImg<double> gImg(imgOri.width(), imgOri.height(), imgOri.depth(), imgOri.spectrum(),0);
+	
+	CImgList<double> base(k+1);
+	base.insert(imgOri, 0);
+	CImgList<double> detail(k);
+	
+	for(int i=0; i<k; i++){
+		cout<< "Itération : " << i << endl;
+		base.insert(filtre_bilateralV2(base(i), fsigmaS, fsigmaR), i+1);
+		detail.insert(base(i) - base(i+1), i);
+// 		gImg += (facteur_detail*detail(i));
+// 		gImg += (pow(1.2, i)-0.5)*detail(i);
+		gImg += (facteur_detail*(i+1) *detail(i));
+		
 		string sigmaS =  to_string(fsigmaS);
 		string sigmaR = to_string(fsigmaR);
 		string it = to_string(i+1);
@@ -212,14 +302,15 @@ CImg<double> decomposition_Method2(const CImg<double>& imgOri, string nomImg, fl
 		nomImgSave = "pyramide_methode2_detail_it_"+it + "_Ss_" + sigmaS+ "_Sr_"+ sigmaR + "_"+ nomImg ;  
 		CImg<double>(detail[i].get_cut(0,255)).save(nomImgSave.c_str());
 		fsigmaR /= 2;
-// 		fsigmaS *=2;
 	}
-	gImg += base(k);
-	cout << "-----------------------------------------" << endl;
+	gImg += (facteur_base*base(k));
+// 	gImg += base(k);
 	
+	cout << "-----------------------------------------" << endl;
+	string nomImgSave = "filtrebilateral_decrease_methode2_" + nomImg ;   
+	CImg<double>(gImg.get_cut(0,255)).save(nomImgSave.c_str());
 	return gImg;
 }
-
 
 int main(int argc, char **argv) {
 	
@@ -230,8 +321,6 @@ int main(int argc, char **argv) {
 		nomImg = string(argv[1]);
 		fsigmaS = atof(argv[2]);
 		fsigmaR = atof(argv[3]);
-		
-		
 	}
 	else{
 		cout<<"Veuillez saisir le nom de l'image avec son extension (ex: lena.jpg)" << endl;
@@ -245,42 +334,20 @@ int main(int argc, char **argv) {
 	}
 	
 	CImg<double> img(nomImg.c_str());
-// 	CImg<double> noiseGauss(img);
-// 	noiseGauss.noise(10);
-	
-// 	CImg<double> fbImg = filtre_bilateral(noiseGauss, nomImg, fsigmaS, fsigmaR);
-	
-// 	CImg<double> fbImg = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
-// 	CImg<double> fbImg = filtre_bilateralV2(img, fsigmaS, fsigmaR);
-	
-// 	CImg<double> imgTest(noiseGauss);
-// 	CImg<double> imgTest(img);
-// 	imgTest = imgTest.blur_bilateral(imgTest, fsigmaS, fsigmaR);
-
-
-	
-	
-// 	CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
-// 	CImgDisplay windows_fbTest(imgTest, "Image filtre bilateral CImg");
-
-		
-	
-	CImg<double> recompo = decomposition_Method1(img, nomImg,fsigmaS, fsigmaR, 3);
+	CImg<double> recompo;
+	CImg<double> recompo2;
+	if(decrease){	
+		recompo = decomposition_Method1_Decrease(img, nomImg,fsigmaS, fsigmaR, 3);
+		recompo2 = decomposition_Method2_Decrease(img, nomImg,fsigmaS, fsigmaR,3);
+	}
+	else
+	{
+		recompo = decomposition_Method1_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
+		recompo2 = decomposition_Method2_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
+	}
 	CImgDisplay recompoD(recompo, "Recomposition methode 1");
-	string nomImgSave = "filtrebilateral_pyramide_methode1_" + nomImg ;   
-	CImg<double>(recompo.get_cut(0,255)).save(nomImgSave.c_str());
-	
-	CImg<double> recompo2 = decomposition_Method2(img, nomImg,fsigmaS, fsigmaR, 3);
 	CImgDisplay recompoD2(recompo2, "Recomposition methode 2");
-	nomImgSave = "filtrebilateral_pyramide_methode2_" + nomImg ;   
-	CImg<double>(recompo2.get_cut(0,255)).save(nomImgSave.c_str());
-	
 	CImgDisplay main(img, "Normal");
-	
-// 	cout << "Valeur de diff max : " << comparaisonImageMax(fbImg, imgTest) << endl;
-// 	cout << "Valeur de diff : " << comparaisonEntreImage(fbImg, imgTest) << endl;
-// 	
-// 	cout << "PSNR : " << noiseGauss.PSNR(fbImg) << endl;
 	 
 	while(!main.is_closed()){
 		main.wait();
