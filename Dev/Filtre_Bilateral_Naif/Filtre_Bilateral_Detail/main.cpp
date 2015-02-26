@@ -10,7 +10,7 @@
 using namespace cimg_library;
 using namespace std;
 
-float facteur_base = 5;
+float facteur_base = 2;
 float facteur_detail = 1;
 bool decrease = false;
 
@@ -38,7 +38,7 @@ CImg<double> filtre_bilateral(CImg<double> img, string nomImg, float fsigmaS, fl
 	cout << "Sigma s : " << fsigmaS << endl;
 	cout << "Sigma r : " << fsigmaR << endl;
 	start = clock();
-	CImg<double> fbImg = fb.applyFilterV2();
+	CImg<double> fbImg = fb.applyFilterV3();
 	temps = (double)(clock()-start)/(double) CLOCKS_PER_SEC;
 	cout<< "Temps d'éxécution : " << temps  << " secondes" << endl;
 	cout<< "Filtre bilatéral : done" << endl;
@@ -77,7 +77,7 @@ CImg<double> filtre_bilateralV2(CImg<double> img, float fsigmaS, float fsigmaR){
 	cout << "Sigma s : " << fsigmaS << endl;
 	cout << "Sigma r : " << fsigmaR << endl;
 	start = clock();
-	CImg<double> fbImg = fb.applyFilterV2();
+	CImg<double> fbImg = fb.applyFilterV3();
 	temps = (double)(clock()-start)/(double) CLOCKS_PER_SEC;
 	cout<< "Temps d'éxécution : " << temps  << " secondes" << endl;
 	cout<< "Filtre bilatéral : done" << endl;
@@ -334,19 +334,22 @@ int main(int argc, char **argv) {
 	}
 	
 	CImg<double> img(nomImg.c_str());
-	CImg<double> recompo;
-	CImg<double> recompo2;
-	if(decrease){	
-		recompo = decomposition_Method1_Decrease(img, nomImg,fsigmaS, fsigmaR, 3);
-		recompo2 = decomposition_Method2_Decrease(img, nomImg,fsigmaS, fsigmaR,3);
-	}
-	else
-	{
-		recompo = decomposition_Method1_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
-		recompo2 = decomposition_Method2_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
-	}
-	CImgDisplay recompoD(recompo, "Recomposition methode 1");
-	CImgDisplay recompoD2(recompo2, "Recomposition methode 2");
+// 	CImg<double> recompo;
+// 	CImg<double> recompo2;
+// 	if(decrease){	
+// 		recompo = decomposition_Method1_Decrease(img, nomImg,fsigmaS, fsigmaR, 3);
+// 		recompo2 = decomposition_Method2_Decrease(img, nomImg,fsigmaS, fsigmaR,3);
+// 	}
+// 	else
+// 	{
+// 		recompo = decomposition_Method1_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
+// 		recompo2 = decomposition_Method2_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
+// 	}
+// 	CImgDisplay recompoD(recompo, "Recomposition methode 1");
+// 	CImgDisplay recompoD2(recompo2, "Recomposition methode 2");
+
+	CImg<double> bfI = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
+	CImgDisplay bfD(bfI, "FB");
 	CImgDisplay main(img, "Normal");
 	 
 	while(!main.is_closed()){
