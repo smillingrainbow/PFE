@@ -116,8 +116,8 @@ CImg<double> FiltreBilateral::applyFilter()
 	return bfImg;
 }
 
-/* calcul de la convolution gaussienne suivant sigma s de value
- * 
+/* 
+ * calcul de la convolution gaussienne suivant sigma s de value
  */
 double FiltreBilateral::loiGaussienne(double value, float sigma){
 	
@@ -313,6 +313,7 @@ CImg< double > FiltreBilateral::applyFilterNdG()
 CImg< double > FiltreBilateral::applyFilterRGB()
 {
 	CImg<double> bfImg(width, height, img.depth(), img.spectrum(),0);
+	// conversion de l'image RGB vers YCbCr
 	CImg<double> imgY = img.get_RGBtoYCbCr();
 	bfImg.RGBtoYCbCr();
 	double wp=0;
@@ -320,7 +321,7 @@ CImg< double > FiltreBilateral::applyFilterRGB()
 	int iXdebut=0, iYdebut=0, iXfin=0, iYfin=0;
 	double gauss=0;
 	double distEuclidienne=0;
-	double value;
+	double value = 0.0;
 	double valueNormal=0.0;
 	
 	cout<< "Image couleur --> passage par la luminance" << endl;
@@ -330,6 +331,11 @@ CImg< double > FiltreBilateral::applyFilterRGB()
 		cimg_forY(imgY, y){
 			wp=0;
 			value = 0.0;
+			
+			// copie de Cb et Cr de l'image 
+			bfImg.set_linear_atXYZ(imgY._atXYZC(x,y,0,1), x, y, 0, 0, false);
+			bfImg.set_linear_atXYZ(imgY._atXYZC(x,y,0,2), x, y, 0, 0, false);
+			
 			// parcours d'un carré de 21x21 autour du pixel courant
 			// délimitation des variables de parcours en fonction de la position du pixel
 			if(x<(size/2)-1){
@@ -366,7 +372,7 @@ CImg< double > FiltreBilateral::applyFilterRGB()
 				for(int iY=iYdebut; iY<=iYfin; iY++){
 					
 					distEuclidienne = distanceEuclidienne(x, y, iX, iY);
-					gauss = loiGaussienne(distEuclidienne, fSigmaS) * 					loiGaussienne(std::abs(imgY._atXYZC(x,y,0,0) - imgY._atXYZC(iX,iY,0,0)), fSigmaR); 
+					gauss = loiGaussienne(distEuclidienne, fSigmaS) * 					loiGaussienne(std::abs(imgY._atXYZC(x,y,0,0) - 								imgY._atXYZC(iX,iY,0,0)), fSigmaR); 
 					
 					value += gauss*imgY._atXYZC(iX,iY, 0, 0);
 					bfImg.set_linear_atXYZ(value, x, y, 0, 0, false);
