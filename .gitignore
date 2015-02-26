@@ -10,3 +10,4 @@ Dev/Test/
 *.toc
 *.out
 *.kdev4
+bin/

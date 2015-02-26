@@ -333,8 +333,8 @@ CImg< double > FiltreBilateral::applyFilterRGB()
 			value = 0.0;
 			
 			// copie de Cb et Cr de l'image 
-			bfImg.set_linear_atXYZ(imgY._atXYZC(x,y,0,1), x, y, 0, 0, false);
-			bfImg.set_linear_atXYZ(imgY._atXYZC(x,y,0,2), x, y, 0, 0, false);
+			bfImg.set_linear_atXYZ(imgY._atXYZC(x,y,0,1), x, y, 0, 1, false);
+			bfImg.set_linear_atXYZ(imgY._atXYZC(x,y,0,2), x, y, 0, 2, false);
 			
 			// parcours d'un carré de 21x21 autour du pixel courant
 			// délimitation des variables de parcours en fonction de la position du pixel

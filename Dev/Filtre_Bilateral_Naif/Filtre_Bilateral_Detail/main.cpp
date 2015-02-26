@@ -10,8 +10,8 @@
 using namespace cimg_library;
 using namespace std;
 
-float facteur_base = 2;
-float facteur_detail = 1;
+float facteur_base = 0.8;
+float facteur_detail = 5;
 bool decrease = false;
 
 
@@ -334,22 +334,23 @@ int main(int argc, char **argv) {
 	}
 	
 	CImg<double> img(nomImg.c_str());
-// 	CImg<double> recompo;
-// 	CImg<double> recompo2;
-// 	if(decrease){	
-// 		recompo = decomposition_Method1_Decrease(img, nomImg,fsigmaS, fsigmaR, 3);
-// 		recompo2 = decomposition_Method2_Decrease(img, nomImg,fsigmaS, fsigmaR,3);
-// 	}
-// 	else
-// 	{
-// 		recompo = decomposition_Method1_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
-// 		recompo2 = decomposition_Method2_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
-// 	}
-// 	CImgDisplay recompoD(recompo, "Recomposition methode 1");
-// 	CImgDisplay recompoD2(recompo2, "Recomposition methode 2");
+	CImg<double> recompo;
+	CImg<double> recompo2;
+	if(decrease){	
+		recompo = decomposition_Method1_Decrease(img, nomImg,fsigmaS, fsigmaR, 3);
+		recompo2 = decomposition_Method2_Decrease(img, nomImg,fsigmaS, fsigmaR,3);
+	}
+	else
+	{
+		recompo = decomposition_Method1_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
+		recompo2 = decomposition_Method2_Increase(img, nomImg,fsigmaS, fsigmaR, 3);
+	}
+	CImgDisplay recompoD(recompo, "Recomposition methode 1");
+	CImgDisplay recompoD2(recompo2, "Recomposition methode 2");
 
-	CImg<double> bfI = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
-	CImgDisplay bfD(bfI, "FB");
+// 	CImg<double> bfI = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
+// 	CImgDisplay bfD(bfI, "FB");
+	
 	CImgDisplay main(img, "Normal");
 	 
 	while(!main.is_closed()){
