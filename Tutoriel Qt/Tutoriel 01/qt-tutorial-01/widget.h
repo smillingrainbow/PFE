@@ -15,6 +15,9 @@ public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
 
+    void setName(const QString &name);
+    QString name() const;
+
 private:
     Ui::Widget *ui;
 };

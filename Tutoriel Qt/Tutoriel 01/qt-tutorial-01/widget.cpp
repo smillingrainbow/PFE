@@ -12,3 +12,13 @@ Widget::~Widget()
 {
     delete ui;
 }
+
+void Widget::setName(const QString &name)
+{
+    ui->lineEdit->setText(name);
+}
+
+QString Widget::name() const
+{
+    return ui->lineEdit->text();
+}
