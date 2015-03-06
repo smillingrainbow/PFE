@@ -481,3 +481,45 @@ Paramètre :
 Tenmps d'éxécution : 115.498secondes
 Nom de l'image avec le filtre : filtrebilateral_sigmaS_4_sigmaR_80_IM146.tif
 ----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 4
+	Sigma R : 20
+Tenmps d'éxécution : 13.4381secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_4_sigmaR_20_IM088.tif
+----------------------------
+Nom de l'image : IM088.tif
+Paramètre : 
+	Sigma S : 64
+	Sigma R : 70
+Tenmps d'éxécution : 13.6832secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_64_sigmaR_70_IM088.tif
+----------------------------
+Nom de l'image : lena.jpg
+Paramètre : 
+	Sigma S : 64
+	Sigma R : 70
+Tenmps d'éxécution : 123.84secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_64_sigmaR_70_lena.jpg
+----------------------------
+Nom de l'image : lena_64_70.jpg
+Paramètre : 
+	Sigma S : 64
+	Sigma R : 70
+Tenmps d'éxécution : 124.151secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_64_sigmaR_70_lena_64_70.jpg
+----------------------------
+Nom de l'image : rock_input.png
+Paramètre : 
+	Sigma S : 4
+	Sigma R : 10
+Tenmps d'éxécution : 248.169secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_4_sigmaR_10_rock_input.png
+----------------------------
+Nom de l'image : rock_input.png
+Paramètre : 
+	Sigma S : 36.5
+	Sigma R : 10
+Tenmps d'éxécution : 250.079secondes
+Nom de l'image avec le filtre : filtrebilateral_sigmaS_36.5_sigmaR_10_rock_input.png
+----------------------------
