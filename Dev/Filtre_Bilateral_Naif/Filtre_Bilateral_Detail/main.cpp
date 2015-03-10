@@ -10,8 +10,8 @@
 using namespace cimg_library;
 using namespace std;
 
-float facteur_base = 0.8;
-float facteur_detail = 5;
+float facteur_base = 2;
+float facteur_detail = 0.8;
 bool decrease = false;
 
 
