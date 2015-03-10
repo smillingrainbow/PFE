@@ -1,4 +1,4 @@
-*.o
+﻿*.o
 Dev/Test/
 *.aux
 *.bbl
@@ -11,3 +11,5 @@ Dev/Test/
 *.out
 *.kdev4
 bin/
+Dev/Doc/
+Dev/build-InterfaceQt-Desktop-Debug/
