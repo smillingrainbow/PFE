@@ -14,6 +14,7 @@ Window::Window(QWidget *parent) :
     createInputGroupBox();
     createOutputGroupBox();
 
+    // connection entre les boutons "charger" et "lancer" avec les l'affichage des images
     connect(loadButton, SIGNAL(clicked()), inputGroupBox, SLOT(show()));
     connect(launchButton, SIGNAL(clicked()), outputGroupBox, SLOT(show()));
 

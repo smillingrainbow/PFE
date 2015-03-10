@@ -4,17 +4,25 @@
 #include <QMainWindow>
 #include "window.h"
 
-
+/**
+ * @brief Classe de l'interface de la fenêtre principale
+ * @author Natacha Marlio-Marette
+ * @version 0.1
+ * @date 10/03/2015
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    public:
+        explicit MainWindow(QWidget *parent = 0);
+        ~MainWindow();
 
-private:
-    Window *mainWidjet;
+    private:
+        /**
+         * @brief Widget principal de la fenêtre
+         */
+        Window *mainWidjet;
 };
 
 #endif // MAINWINDOW_H
