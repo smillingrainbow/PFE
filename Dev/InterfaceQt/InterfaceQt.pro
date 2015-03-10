@@ -10,14 +10,17 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = InterfaceQt
 TEMPLATE = app
-
+LIBS += -lreadline -lpthread -lm -lX11
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    window.cpp
+    window.cpp \
+    filterbilateral.cpp
 
 HEADERS  += mainwindow.h \
-    window.h
+    window.h \
+    filterbilateral.h \
+    CImg.h
 
 FORMS    += mainwindow.ui \
     window.ui
