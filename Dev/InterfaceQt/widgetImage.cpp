@@ -181,8 +181,10 @@ void widgetImage::launchButtonClicked()
     else{
         Controller *controller = new Controller;
         outputImage = controller->changeDetails(fileNameInput, raiseCheckBox->isChecked());
+
         if(!outputGroupBox->isVisible())
             outputGroupBox->show();
+        outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
     }
 }
 

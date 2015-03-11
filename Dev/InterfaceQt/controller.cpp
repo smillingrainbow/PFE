@@ -11,11 +11,11 @@ float alphaLower = 1;
 float betaLower = 0.5;
 int nbrIteration = 3;
 
-QImage* Controller::changeDetails(QString fileName, bool detail)
+QImage* Controller::changeDetails(QString fileNameInput, bool detail)
 {
-    CImg<double> imgInput(fileName.toStdString().c_str());
-    CImgDisplay (imgInput,"entree");
+    CImg<double> imgInput(fileNameInput.toStdString().c_str());
     CImg<double> imgOutput;
+
     // rehaussement
     if(detail){
         imgOutput = raiseDetails(imgInput);
@@ -24,58 +24,83 @@ QImage* Controller::changeDetails(QString fileName, bool detail)
     else{
         imgOutput = lowerDetails(imgInput);
     }
+    imgOutput.get_cut(0,255);
 
-    CImgDisplay display(imgOutput, "Manipulation");
+    QFileInfo fileInput(fileNameInput);
+    QString fileNameOutput = fileInput.path() +"fb_"+fileInput.fileName();
+    CImg<double> (imgOutput.save(fileNameOutput.toStdString().c_str()));
+    QImage *img = new QImage;
+    img->load(fileNameOutput);
 
-    return new QImage();
+    return img;
 }
 
-CImg<double> Controller::raiseDetails(CImg<double> imgInput)
+CImg<double> Controller::raiseDetails(CImg<double>& imgInput)
 {
+    cout << "==========RAISE DETAILS DEBUT==========" << endl;
+
     CImg<double> gImg(imgInput.width(), imgInput.height(), imgInput.depth(), imgInput.spectrum(),0);
 
     CImgList<double> base(nbrIteration+1);
     base.insert(imgInput, 0);
     CImgList<double> detail(nbrIteration);
 
-    FilterBilateral fb;
-    fb.set_fSigmaS(fsigmaS);
+    float sigmaR = fsigmaR;
 
     for(int i=0; i<nbrIteration; i++){
-        fb.set_img(base(i));
-        fb.set_fSigmaS(fsigmaR);
-
-        base.insert(fb.applyFilter(), i+1);
+        cout<< "Iteration : " << i << endl;
+        base.insert(bilateralFilter(base(i), sigmaR), i+1);
         detail.insert(base(i) - base(i+1), i);
         gImg += (betaRaise*(i+1) *detail(i));
+        sigmaR *= 2;
     }
     gImg += (alphaRaise*base(nbrIteration));
+    cout << "==========RAISE DETAILS FIN==========" << endl;
 
     return gImg.get_cut(0,255);
 }
 
-CImg<double> Controller::lowerDetails(cimg_library::CImg<double> imgInput)
+CImg<double> Controller::lowerDetails(cimg_library::CImg<double> &imgInput)
 {
+    cout << "==========LOWER DETAILS DEBUT==========" << endl;
+
     CImg<double> gImg(imgInput.width(), imgInput.height(), imgInput.depth(), imgInput.spectrum(),0);
 
     CImgList<double> base(nbrIteration+1);
     base.insert(imgInput, 0);
     CImgList<double> detail(nbrIteration);
 
-    FilterBilateral fb;
-    fb.set_fSigmaS(fsigmaS);
+    float sigmaR = fsigmaR;
 
     for(int i=0; i<nbrIteration; i++){
-        fb.set_img(base(i));
-        fb.set_fSigmaS(fsigmaR);
-
-        base.insert(fb.applyFilter(), i+1);
+        cout<< "Iteration : " << i << endl;
+        base.insert(bilateralFilter(base(i), sigmaR), i+1);
         detail.insert(base(i) - base(i+1), i);
         gImg += (betaLower*(i+1) *detail(i));
+        sigmaR *= 2;
     }
     gImg += (alphaLower*base(nbrIteration));
 
+    cout << "==========LOWER DETAILS FIN==========" << endl;
+
     return gImg.get_cut(0,255);
-    return CImg<double>();
+}
+
+CImg<double> Controller::bilateralFilter(CImg<double> img, float sigmaR){
+    double temps;
+    clock_t start;
+
+    FilterBilateral fb(fsigmaS, sigmaR, img);
+    cout<< ">>>>>FILTRE BILATERAL DEBUT" << endl;
+    cout << "Sigma S : " << fsigmaS << " Sigma R : " << sigmaR << endl;
+
+    start = clock();
+    CImg<double> fbImg = fb.applyFilter();
+    temps = (double) (start - clock())/(double) CLOCKS_PER_SEC;
+
+    cout << "Temps d'éxécution : " << temps << "s" <<endl;
+    cout << "<<<<<FILTRE BILATERAL FIN" << endl;
+
+    return CImg<double> (fbImg.get_cut(0,255));
 }
 
