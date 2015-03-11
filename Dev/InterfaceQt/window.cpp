@@ -7,6 +7,7 @@ Window::Window(QWidget *parent) :
     QHBoxLayout *rightLayout = new QHBoxLayout;
     QHBoxLayout *mainLayout = new QHBoxLayout;
 
+    // Création de l'interface
     createLoadGroupBox();
     createDetailsGroupBox();
     createInfoGroupBox();
@@ -14,10 +15,10 @@ Window::Window(QWidget *parent) :
     createInputGroupBox();
     createOutputGroupBox();
 
-    // connection entre les boutons "charger" et "lancer" avec les l'affichage des images
-    connect(loadButton, SIGNAL(clicked()), inputGroupBox, SLOT(show()));
-    connect(launchButton, SIGNAL(clicked()), outputGroupBox, SLOT(show()));
+    // Création des connections
+    createConnection();
 
+    // Positionnement des widgets
     leftVLayout->addWidget(loadGroupBox);
     leftVLayout->addWidget(detailsGroupBox);
     leftVLayout->addWidget(infoGroupBox);
@@ -32,10 +33,6 @@ Window::Window(QWidget *parent) :
     this->setLayout(mainLayout);
 
 
-}
-
-Window::~Window()
-{
 }
 
 void Window::createLoadGroupBox()
@@ -108,15 +105,71 @@ void Window::createSaveGroupBox()
 
 void Window::createInputGroupBox()
 {
+    QHBoxLayout *hbox = new QHBoxLayout;
     inputGroupBox = new QGroupBox("Image initiale");
     inputLabel = new QLabel;
+    hbox->addWidget(inputLabel);
+    inputGroupBox->setLayout(hbox);
     inputGroupBox->hide();
 }
 
 void Window::createOutputGroupBox()
 {
+    QHBoxLayout *hbox = new QHBoxLayout;
     outputGroupBox = new QGroupBox("Image finale");
     outputLabel =  new QLabel;
+    hbox->addWidget(outputLabel);
+    outputGroupBox->setLayout(hbox);
     outputGroupBox->hide();
 }
 
+void Window::createConnection()
+{
+    connect(loadButton, SIGNAL(clicked()), this, SLOT(loadButtonClicked()));
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClicked()));
+
+    connect(launchButton, SIGNAL(clicked()), this, SLOT(launchButtonClicked()));
+
+    connect(navLoadButton, SIGNAL(clicked()), this, SLOT(navLoadButtonClicked()));
+    connect(navSaveButton, SIGNAL(clicked()), this, SLOT(navSaveButtonClicked()));
+}
+
+void Window::navLoadButtonClicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
+    if(!fileName.isEmpty()){
+        loadLineEdit->setText(fileName);
+    }
+
+}
+
+void Window::navSaveButtonClicked()
+{
+
+}
+
+void Window::loadButtonClicked()
+{
+    if(!inputGroupBox->isVisible())
+        inputGroupBox->show();
+
+    QString fileName = loadLineEdit->text();
+    QImage image(fileName);
+    if(image.isNull()){
+       QMessageBox::information(this, "Chargement de l'image", "Chargemeent impossible de l'image "+fileName);
+    }
+    else{
+        inputLabel->setPixmap(QPixmap::fromImage(image));
+    }
+}
+
+void Window::launchButtonClicked()
+{
+    if(!outputGroupBox->isVisible())
+        outputGroupBox->show();
+}
+
+void Window::saveButtonClicked()
+{
+
+}

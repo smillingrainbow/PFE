@@ -3,21 +3,21 @@
 using namespace cimg_library;
 using namespace std;
 
-double FiltreBilateral::loiGaussienne(double value, float sigma){
+double FilterBilateral::loiGaussienne(double value, float sigma){
 
     double gauss = (1/(2*M_PI* pow(sigma,2))) * exp(-(pow(value,2))/(2*pow(sigma,2)));
 
     return gauss;
 }
 
-double FiltreBilateral::distanceEuclidienne(int xP, int yP, int xQ, int yQ){
+double FilterBilateral::distanceEuclidienne(int xP, int yP, int xQ, int yQ){
 
     double dist = pow(xP - xQ, 2) + pow(yP - yQ, 2);
     dist = sqrt(dist);
     return dist;
 }
 
-CImg< double > FiltreBilateral::applyFilter(){
+CImg< double > FilterBilateral::applyFilter(){
     CImg<double> bfImg;
 
     // image en niveau de gris
@@ -32,7 +32,7 @@ CImg< double > FiltreBilateral::applyFilter(){
     return bfImg;
 }
 
-CImg< double > FiltreBilateral::applyFilterNdG()
+CImg< double > FilterBilateral::applyFilterNdG()
 {
     CImg<double> bfImg(width, height, img.depth(), img.spectrum(),0);
     double wp=0;
@@ -101,7 +101,7 @@ CImg< double > FiltreBilateral::applyFilterNdG()
 
 }
 
-CImg< double > FiltreBilateral::applyFilterRGB()
+CImg< double > FilterBilateral::applyFilterRGB()
 {
     CImg<double> bfImg(width, height, img.depth(), img.spectrum(),0);
     // conversion de l'image RGB vers YCbCr

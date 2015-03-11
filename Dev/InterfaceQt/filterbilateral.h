@@ -31,12 +31,12 @@ class FilterBilateral
          * @param fsigmaR Valeur de sigma R
          * @param input Image initiale
          */
-        FilterBilateral(float fsigmaS, float fsigmaR, const CImg<double> &input):img(input), fSigmaS(fsigmaS), fSigmaR(fsigmaR), width(input.width()), height(input.height()){}
+        FilterBilateral(float fsigmaS, float fsigmaR, const cimg_library::CImg<double> &input):img(input), fSigmaS(fsigmaS), fSigmaR(fsigmaR), width(input.width()), height(input.height()){}
         /**
          * @brief Constructeur
          * @param input Image initiale
          */
-        FilterBilateral(const CImg<double> &input): img(input),fSigmaS(0), fSigmaR(0),width(input.width()), height(input.height()){}
+        FilterBilateral(const cimg_library::CImg<double> &input): img(input),fSigmaS(0), fSigmaR(0),width(input.width()), height(input.height()){}
         /**
           * @brief Destructeur
           */

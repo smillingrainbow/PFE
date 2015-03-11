@@ -10,6 +10,8 @@
 #include <QCheckBox>
 #include <QButtonGroup>
 #include <QLabel>
+#include <QFileDialog>
+#include <QMessageBox>
 
 /**
  * @brief Classe du widget principal
@@ -23,8 +25,22 @@ class Window : public QWidget
     Q_OBJECT
 
     public:
+        /**
+         * @brief Constructeur du widget
+         * @param parent
+         */
         explicit Window(QWidget *parent = 0);
-        ~Window();
+        /**
+          * @brief Destructeur
+          **/
+        ~Window(){}
+
+    private slots:
+        void navLoadButtonClicked();
+        void navSaveButtonClicked();
+        void loadButtonClicked();
+        void launchButtonClicked();
+        void saveButtonClicked();
 
     private:
         void createLoadGroupBox();
@@ -33,6 +49,11 @@ class Window : public QWidget
         void createSaveGroupBox();
         void createInputGroupBox();
         void createOutputGroupBox();
+        /**
+         * @brief Création des connections
+         *  Cette méthode permet de créer les connections entre les boutons et les actions qu'ils engendrent
+         */
+        void createConnection();
 
         QGroupBox *loadGroupBox;
         QGroupBox *detailsGroupBox;
