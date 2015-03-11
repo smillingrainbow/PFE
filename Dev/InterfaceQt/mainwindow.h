@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "window.h"
+#include "widgetImage.h"
 
 /**
  * @brief Classe de l'interface de la fenêtre principale
@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow
         /**
          * @brief Widget principal de la fenêtre
          */
-        Window *mainWidjet;
+        widgetImage *mainWidjet;
 };
 
 #endif // MAINWINDOW_H

@@ -1,13 +1,9 @@
 #include "controller.h"
 
-Controller::Controller()
+QImage* Controller::changeDetails(QString fileName, bool details)
 {
 
-}
-
-QImage Controller::changeDetails()
-{
-    return QImage();
+    return new QImage();
 }
 
 QImage Controller::raiseDetails()

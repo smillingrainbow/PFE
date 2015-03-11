@@ -1,6 +1,6 @@
-#include "window.h"
+#include "widgetImage.h"
 
-Window::Window(QWidget *parent) :
+widgetImage::widgetImage(QWidget *parent) :
     QWidget(parent)
 {
     QVBoxLayout *leftVLayout = new QVBoxLayout;
@@ -35,7 +35,7 @@ Window::Window(QWidget *parent) :
 
 }
 
-void Window::createLoadGroupBox()
+void widgetImage::createLoadGroupBox()
 {
     loadGroupBox = new QGroupBox("Charger une image");
     loadLineEdit = new QLineEdit;
@@ -53,7 +53,7 @@ void Window::createLoadGroupBox()
     loadGroupBox->setLayout(vbox);
 }
 
-void Window::createDetailsGroupBox()
+void widgetImage::createDetailsGroupBox()
 {
     QButtonGroup *buttonGroup = new QButtonGroup;
     detailsGroupBox = new QGroupBox("Manipulation des détails");
@@ -72,7 +72,7 @@ void Window::createDetailsGroupBox()
     detailsGroupBox->setLayout(vbox);
 }
 
-void Window::createInfoGroupBox()
+void widgetImage::createInfoGroupBox()
 {
     infoGroupBox = new QGroupBox("Informations complémentaires");
     infoTextEdit = new QTextEdit;
@@ -85,7 +85,7 @@ void Window::createInfoGroupBox()
     infoGroupBox->setLayout(vbox);
 }
 
-void Window::createSaveGroupBox()
+void widgetImage::createSaveGroupBox()
 {
     saveGroupBox = new QGroupBox("Sauvegarder");
     saveLineEdit = new QLineEdit;
@@ -103,27 +103,29 @@ void Window::createSaveGroupBox()
     saveGroupBox->setLayout(vbox);
 }
 
-void Window::createInputGroupBox()
+void widgetImage::createInputGroupBox()
 {
     QHBoxLayout *hbox = new QHBoxLayout;
     inputGroupBox = new QGroupBox("Image initiale");
     inputLabel = new QLabel;
+    inputImage = new QImage;
     hbox->addWidget(inputLabel);
     inputGroupBox->setLayout(hbox);
     inputGroupBox->hide();
 }
 
-void Window::createOutputGroupBox()
+void widgetImage::createOutputGroupBox()
 {
     QHBoxLayout *hbox = new QHBoxLayout;
     outputGroupBox = new QGroupBox("Image finale");
     outputLabel =  new QLabel;
+    outputImage = new QImage;
     hbox->addWidget(outputLabel);
     outputGroupBox->setLayout(hbox);
     outputGroupBox->hide();
 }
 
-void Window::createConnection()
+void widgetImage::createConnection()
 {
     connect(loadButton, SIGNAL(clicked()), this, SLOT(loadButtonClicked()));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClicked()));
@@ -134,7 +136,7 @@ void Window::createConnection()
     connect(navSaveButton, SIGNAL(clicked()), this, SLOT(navSaveButtonClicked()));
 }
 
-void Window::navLoadButtonClicked()
+void widgetImage::navLoadButtonClicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
     if(!fileName.isEmpty()){
@@ -143,33 +145,61 @@ void Window::navLoadButtonClicked()
 
 }
 
-void Window::navSaveButtonClicked()
+void widgetImage::navSaveButtonClicked()
 {
-
+    QString fileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
+    if(!fileName.isEmpty()){
+        saveLineEdit->setText(fileName);
+    }
 }
 
-void Window::loadButtonClicked()
+void widgetImage::loadButtonClicked()
 {
     if(!inputGroupBox->isVisible())
         inputGroupBox->show();
 
-    QString fileName = loadLineEdit->text();
-    QImage image(fileName);
-    if(image.isNull()){
-       QMessageBox::information(this, "Chargement de l'image", "Chargemeent impossible de l'image "+fileName);
+    fileNameInput = loadLineEdit->text();
+
+    if(fileNameInput.isEmpty()){
+        QMessageBox::information(this, "Erreur : pas d'image", "Veuillez indiquez où se situe l'image à charger");
     }
     else{
-        inputLabel->setPixmap(QPixmap::fromImage(image));
+        inputImage->load(fileNameInput);
+        if(inputImage->isNull()){
+           QMessageBox::information(this, "Chargement de l'image", "Chargemeent impossible de l'image "+fileNameInput);
+        }
+        else{
+            inputLabel->setPixmap(QPixmap::fromImage(*inputImage));
+        }
     }
 }
 
-void Window::launchButtonClicked()
+void widgetImage::launchButtonClicked()
 {
     if(!outputGroupBox->isVisible())
         outputGroupBox->show();
+
+    if(inputImage->isNull()){
+        QMessageBox::information(this, "Erreur : pas d'image", "Veuillez d'abord charger une image avant de lancer l'application");
+    }
+    else{
+        Controller *controller = new Controller;
+        outputImage = controller->changeDetails(fileNameInput, raiseCheckBox->isChecked());
+    }
 }
 
-void Window::saveButtonClicked()
+void widgetImage::saveButtonClicked()
 {
-
+    if(outputImage->isNull()){
+        QMessageBox::information(this, "Erreur pas d'image", "Il n'y a pas d'image à sauvegarder");
+    }
+    else{
+        QString fileName = saveLineEdit->text();
+        if(!fileName.isEmpty()){
+            QMessageBox::information(this, "Erreur pas de fichier", "Veuillez indiquez où enregistrer l'image");
+        }
+        else{
+            outputImage->save(fileName);
+        }
+    }
 }

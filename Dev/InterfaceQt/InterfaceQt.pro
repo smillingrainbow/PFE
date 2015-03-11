@@ -14,15 +14,15 @@ LIBS += -lreadline -lpthread -lm -lX11
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    window.cpp \
     filterbilateral.cpp \
-    controller.cpp
+    controller.cpp \
+    widgetImage.cpp
 
 HEADERS  += mainwindow.h \
-    window.h \
     filterbilateral.h \
     CImg.h \
-    controller.h
+    controller.h \
+    widgetImage.h
 
 FORMS    += mainwindow.ui \
     window.ui

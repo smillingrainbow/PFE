@@ -13,6 +13,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include "controller.h"
+
 /**
  * @brief Classe du widget principal
  * Ce widget est contenu dans la fenêtre principale
@@ -20,7 +22,7 @@
  * @version 0.1
  * @date 10/03/2015
  */
-class Window : public QWidget
+class widgetImage : public QWidget
 {
     Q_OBJECT
 
@@ -29,11 +31,11 @@ class Window : public QWidget
          * @brief Constructeur du widget
          * @param parent
          */
-        explicit Window(QWidget *parent = 0);
+        explicit widgetImage(QWidget *parent = 0);
         /**
           * @brief Destructeur
           **/
-        ~Window(){}
+        ~widgetImage(){}
 
     private slots:
         void navLoadButtonClicked();
@@ -77,6 +79,11 @@ class Window : public QWidget
 
         QLabel *inputLabel;
         QLabel *outputLabel;
+
+        QImage *inputImage;
+        QImage *outputImage;
+
+        QString fileNameInput;
 };
 
 #endif // WINDOW_H

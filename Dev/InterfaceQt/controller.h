@@ -2,16 +2,15 @@
 #define CONTROLLER_H
 
 #include <QImage>
-#include "CImg.h"
-#include "filterbilateral.h"
+//#include "filterbilateral.h"
 
 class Controller
 {
     public:
-        Controller();
+        Controller(){}
         ~Controller(){}
 
-        QImage changeDetails();
+        QImage* changeDetails(QString fileName, bool detail);
 
     private:
         QImage raiseDetails();

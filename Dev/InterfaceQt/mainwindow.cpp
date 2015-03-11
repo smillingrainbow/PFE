@@ -3,7 +3,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    mainWidjet = new Window();
+    mainWidjet = new widgetImage();
     this->setCentralWidget(mainWidjet);
 }
 
