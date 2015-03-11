@@ -1,6 +1,6 @@
 #include "widgetImage.h"
 
-widgetImage::widgetImage(QWidget *parent) :
+WidgetImage::WidgetImage(QWidget *parent) :
     QWidget(parent)
 {
     QVBoxLayout *leftVLayout = new QVBoxLayout;
@@ -11,6 +11,7 @@ widgetImage::widgetImage(QWidget *parent) :
     createLoadGroupBox();
     createDetailsGroupBox();
     createInfoGroupBox();
+    launchButton = new QPushButton("Lancer");
     createSaveGroupBox();
     createInputGroupBox();
     createOutputGroupBox();
@@ -22,6 +23,7 @@ widgetImage::widgetImage(QWidget *parent) :
     leftVLayout->addWidget(loadGroupBox);
     leftVLayout->addWidget(detailsGroupBox);
     leftVLayout->addWidget(infoGroupBox);
+    leftVLayout->addWidget(launchButton);
     leftVLayout->addWidget(saveGroupBox);
 
     rightLayout->addWidget(inputGroupBox);
@@ -35,7 +37,7 @@ widgetImage::widgetImage(QWidget *parent) :
 
 }
 
-void widgetImage::createLoadGroupBox()
+void WidgetImage::createLoadGroupBox()
 {
     loadGroupBox = new QGroupBox("Charger une image");
     loadLineEdit = new QLineEdit;
@@ -53,7 +55,7 @@ void widgetImage::createLoadGroupBox()
     loadGroupBox->setLayout(vbox);
 }
 
-void widgetImage::createDetailsGroupBox()
+void WidgetImage::createDetailsGroupBox()
 {
     QButtonGroup *buttonGroup = new QButtonGroup;
     detailsGroupBox = new QGroupBox("Manipulation des détails");
@@ -72,20 +74,50 @@ void widgetImage::createDetailsGroupBox()
     detailsGroupBox->setLayout(vbox);
 }
 
-void widgetImage::createInfoGroupBox()
+void WidgetImage::createInfoGroupBox()
 {
-    infoGroupBox = new QGroupBox("Informations complémentaires");
-    infoTextEdit = new QTextEdit;
-    launchButton = new QPushButton("Lancer");
-
+    QLabel *nbIterationLabel = new QLabel("Nombre d'itérations");
+    QLabel *sigmaSLabel = new QLabel("Sigma S");
+    QLabel *sigmaRLabel = new QLabel("Sigma R");
+    QLabel *alphaLabel = new QLabel("Alpha");
+    QLabel *betaLabel = new QLabel("Beta");
+    QHBoxLayout *nbIterationHLayout = new QHBoxLayout;
+    QHBoxLayout *sigmaSHLayout = new QHBoxLayout;
+    QHBoxLayout *sigmaRHLayout = new QHBoxLayout;
+    QHBoxLayout *alphaHLayout = new QHBoxLayout;
+    QHBoxLayout *betaHLayout = new QHBoxLayout;
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(infoTextEdit);
-    vbox->addWidget(launchButton);
+
+    infoGroupBox = new QGroupBox("Informations complémentaires");
+    nbIterationLineEdit = new QLineEdit;
+    sigmaSLineEdit = new QLineEdit;
+    sigmaRLineEdit = new QLineEdit;
+    alphaLineEdit = new QLineEdit;
+    betaLineEdit = new QLineEdit;
+
+    infoGroupBox->setCheckable(true);
+    infoGroupBox->setChecked(false);
+
+    nbIterationHLayout->addWidget(nbIterationLabel);
+    nbIterationHLayout->addWidget(nbIterationLineEdit);
+    sigmaSHLayout->addWidget(sigmaSLabel);
+    sigmaSHLayout->addWidget(sigmaSLineEdit);
+    sigmaRHLayout->addWidget(sigmaRLabel);
+    sigmaRHLayout->addWidget(sigmaRLineEdit);
+    alphaHLayout->addWidget(alphaLabel);
+    alphaHLayout->addWidget(alphaLineEdit);
+    betaHLayout->addWidget(betaLabel);
+    betaHLayout->addWidget(betaLineEdit);
+    vbox->addLayout(nbIterationHLayout);
+    vbox->addLayout(sigmaSHLayout);
+    vbox->addLayout(sigmaRHLayout);
+    vbox->addLayout(alphaHLayout);
+    vbox->addLayout(betaHLayout);
 
     infoGroupBox->setLayout(vbox);
 }
 
-void widgetImage::createSaveGroupBox()
+void WidgetImage::createSaveGroupBox()
 {
     saveGroupBox = new QGroupBox("Sauvegarder");
     saveLineEdit = new QLineEdit;
@@ -103,7 +135,7 @@ void widgetImage::createSaveGroupBox()
     saveGroupBox->setLayout(vbox);
 }
 
-void widgetImage::createInputGroupBox()
+void WidgetImage::createInputGroupBox()
 {
     QHBoxLayout *hbox = new QHBoxLayout;
     inputGroupBox = new QGroupBox("Image initiale");
@@ -114,7 +146,7 @@ void widgetImage::createInputGroupBox()
     inputGroupBox->hide();
 }
 
-void widgetImage::createOutputGroupBox()
+void WidgetImage::createOutputGroupBox()
 {
     QHBoxLayout *hbox = new QHBoxLayout;
     outputGroupBox = new QGroupBox("Image finale");
@@ -125,7 +157,7 @@ void widgetImage::createOutputGroupBox()
     outputGroupBox->hide();
 }
 
-void widgetImage::createConnection()
+void WidgetImage::createConnection()
 {
     connect(loadButton, SIGNAL(clicked()), this, SLOT(loadButtonClicked()));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClicked()));
@@ -136,7 +168,7 @@ void widgetImage::createConnection()
     connect(navSaveButton, SIGNAL(clicked()), this, SLOT(navSaveButtonClicked()));
 }
 
-void widgetImage::navLoadButtonClicked()
+void WidgetImage::navLoadButtonClicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
     if(!fileName.isEmpty()){
@@ -145,7 +177,7 @@ void widgetImage::navLoadButtonClicked()
 
 }
 
-void widgetImage::navSaveButtonClicked()
+void WidgetImage::navSaveButtonClicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
     if(!fileName.isEmpty()){
@@ -153,7 +185,7 @@ void widgetImage::navSaveButtonClicked()
     }
 }
 
-void widgetImage::loadButtonClicked()
+void WidgetImage::loadButtonClicked()
 {
     fileNameInput = loadLineEdit->text();
 
@@ -173,22 +205,62 @@ void widgetImage::loadButtonClicked()
     }
 }
 
-void widgetImage::launchButtonClicked()
+void WidgetImage::launchButtonClicked()
 {
     if(inputImage->isNull()){
         QMessageBox::information(this, "Erreur : pas d'image", "Veuillez d'abord charger une image avant de lancer l'application");
     }
     else{
         Controller *controller = new Controller;
-        outputImage = controller->changeDetails(fileNameInput, raiseCheckBox->isChecked());
+        // pas d'informations saisis par l'utilisateur
+        if(!infoGroupBox->isChecked()){
+            outputImage = controller->changeDetails(fileNameInput, raiseCheckBox->isChecked());
+            outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
+        }
+        else{
+            bool nbIterationBool=true, sigmaSBool=true,sigmaRBool=true, alphaBool=true, betaBool=true;
+            int nbIteration=0;
+            float sigmaS=0.0, sigmaR=0.0, alpha=0.0, beta=0.0;
+
+            // Récupération des saisies de l'utilisateur
+            if(!nbIterationLineEdit->text().isEmpty())
+                nbIteration = nbIterationLineEdit->text().toInt(&nbIterationBool);
+            if(!sigmaSLineEdit->text().isEmpty())
+                sigmaS = sigmaSLineEdit->text().toFloat(&sigmaSBool);
+            if(!sigmaRLineEdit->text().isEmpty())
+                sigmaR = sigmaRLineEdit->text().toFloat(&sigmaRBool);
+            if(!alphaLineEdit->text().isEmpty())
+                alpha = alphaLineEdit->text().toFloat(&alphaBool);
+            if(!betaLineEdit->text().isEmpty())
+                beta = betaLineEdit->text().toFloat(&betaBool);
+
+            // Vérification de la validité des paramètres saisis
+            if(!nbIterationBool || !sigmaSBool || !sigmaRBool || !alphaBool || !betaBool){
+                QMessageBox::information(this, "Erreur de parmètre(s)", "Veuillez saisir des paramètres valides");
+            }
+            else{
+                if(nbIteration!=0)
+                    controller->setNbIteration(nbIteration);
+                if(sigmaS!=0.0)
+                    controller->setSigmaS(sigmaS);
+                if(sigmaR!=0.0)
+                    controller->setSigmaR(sigmaR);
+                if(alpha!=0.0)
+                    controller->setAlpha(alpha);
+                if(beta!=0.0)
+                    controller->setBeta(beta);
+                outputImage = controller->changeDetailsUser(fileNameInput, raiseCheckBox->isChecked());
+                outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
+            }
+
+        }
 
         if(!outputGroupBox->isVisible())
             outputGroupBox->show();
-        outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
     }
 }
 
-void widgetImage::saveButtonClicked()
+void WidgetImage::saveButtonClicked()
 {
     if(outputImage->isNull()){
         QMessageBox::information(this, "Erreur pas d'image", "Il n'y a pas d'image à sauvegarder");

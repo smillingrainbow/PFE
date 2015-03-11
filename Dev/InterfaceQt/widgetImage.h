@@ -22,7 +22,7 @@
  * @version 0.1
  * @date 10/03/2015
  */
-class widgetImage : public QWidget
+class WidgetImage : public QWidget
 {
     Q_OBJECT
 
@@ -31,11 +31,11 @@ class widgetImage : public QWidget
          * @brief Constructeur du widget
          * @param parent
          */
-        explicit widgetImage(QWidget *parent = 0);
+        explicit WidgetImage(QWidget *parent = 0);
         /**
           * @brief Destructeur
           **/
-        ~widgetImage(){}
+        ~WidgetImage(){}
 
     private slots:
         void navLoadButtonClicked();
@@ -66,7 +66,11 @@ class widgetImage : public QWidget
 
         QLineEdit *loadLineEdit;
         QLineEdit *saveLineEdit;
-        QTextEdit *infoTextEdit;
+        QLineEdit *nbIterationLineEdit;
+        QLineEdit *sigmaSLineEdit;
+        QLineEdit *sigmaRLineEdit;
+        QLineEdit *alphaLineEdit;
+        QLineEdit *betaLineEdit;
 
         QPushButton *navLoadButton;
         QPushButton *loadButton;

@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow
         /**
          * @brief Widget principal de la fenêtre
          */
-        widgetImage *mainWidjet;
+        WidgetImage *mainWidjet;
 };
 
 #endif // MAINWINDOW_H
