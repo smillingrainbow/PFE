@@ -195,11 +195,12 @@ void widgetImage::saveButtonClicked()
     }
     else{
         QString fileName = saveLineEdit->text();
-        if(!fileName.isEmpty()){
+        if(fileName.isEmpty()){
             QMessageBox::information(this, "Erreur pas de fichier", "Veuillez indiquez où enregistrer l'image");
         }
         else{
             outputImage->save(fileName);
+            QMessageBox::information(this, "Information", "Votre image a bien été sauvegardée");
         }
     }
 }

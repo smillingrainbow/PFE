@@ -9,7 +9,7 @@ float alphaRaise = 0.8;
 float betaRaise = 3;
 float alphaLower = 1;
 float betaLower = 0.5;
-int nbrIteration = 3;
+int nbrIteration = 1;
 
 QImage* Controller::changeDetails(QString fileNameInput, bool detail)
 {
@@ -31,6 +31,9 @@ QImage* Controller::changeDetails(QString fileNameInput, bool detail)
     CImg<double> (imgOutput.save(fileNameOutput.toStdString().c_str()));
     QImage *img = new QImage;
     img->load(fileNameOutput);
+
+    QFile fileOutput(fileNameOutput);
+    fileOutput.remove();
 
     return img;
 }
