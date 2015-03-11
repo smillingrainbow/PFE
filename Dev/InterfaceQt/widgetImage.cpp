@@ -155,9 +155,6 @@ void widgetImage::navSaveButtonClicked()
 
 void widgetImage::loadButtonClicked()
 {
-    if(!inputGroupBox->isVisible())
-        inputGroupBox->show();
-
     fileNameInput = loadLineEdit->text();
 
     if(fileNameInput.isEmpty()){
@@ -169,6 +166,8 @@ void widgetImage::loadButtonClicked()
            QMessageBox::information(this, "Chargement de l'image", "Chargemeent impossible de l'image "+fileNameInput);
         }
         else{
+            if(!inputGroupBox->isVisible())
+                inputGroupBox->show();
             inputLabel->setPixmap(QPixmap::fromImage(*inputImage));
         }
     }
@@ -176,15 +175,14 @@ void widgetImage::loadButtonClicked()
 
 void widgetImage::launchButtonClicked()
 {
-    if(!outputGroupBox->isVisible())
-        outputGroupBox->show();
-
     if(inputImage->isNull()){
         QMessageBox::information(this, "Erreur : pas d'image", "Veuillez d'abord charger une image avant de lancer l'application");
     }
     else{
         Controller *controller = new Controller;
         outputImage = controller->changeDetails(fileNameInput, raiseCheckBox->isChecked());
+        if(!outputGroupBox->isVisible())
+            outputGroupBox->show();
     }
 }
 

@@ -2,7 +2,9 @@
 #define CONTROLLER_H
 
 #include <QImage>
-//#include "filterbilateral.h"
+#include <string>
+#include "filterbilateral.h"
+#include "CImg.h"
 
 class Controller
 {
@@ -13,8 +15,8 @@ class Controller
         QImage* changeDetails(QString fileName, bool detail);
 
     private:
-        QImage raiseDetails();
-        QImage lowerDetails();
+        cimg_library::CImg<double> raiseDetails(cimg_library::CImg<double> imgInput);
+        cimg_library::CImg<double> lowerDetails(cimg_library::CImg<double> imgInput);
 
 };
 
