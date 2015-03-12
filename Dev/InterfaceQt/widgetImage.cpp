@@ -33,8 +33,6 @@ WidgetImage::WidgetImage(QWidget *parent) :
     mainLayout->addLayout(rightLayout);
 
     this->setLayout(mainLayout);
-
-
 }
 
 void WidgetImage::createLoadGroupBox()
@@ -42,15 +40,14 @@ void WidgetImage::createLoadGroupBox()
     loadGroupBox = new QGroupBox("Charger une image");
     loadLineEdit = new QLineEdit;
     navLoadButton = new QPushButton("Navigation");
-    loadButton = new QPushButton("Charger");
     QVBoxLayout *vbox = new QVBoxLayout;
     QHBoxLayout *hbox = new QHBoxLayout;
 
+    loadLineEdit->setReadOnly(true);
 
     hbox->addWidget(loadLineEdit);
     hbox->addWidget(navLoadButton);
     vbox->addLayout(hbox);
-    vbox->addWidget(loadButton);
 
     loadGroupBox->setLayout(vbox);
 }
@@ -122,15 +119,14 @@ void WidgetImage::createSaveGroupBox()
     saveGroupBox = new QGroupBox("Sauvegarder");
     saveLineEdit = new QLineEdit;
     navSaveButton = new QPushButton("Navigation");
-    saveButton = new QPushButton("Sauvegarder");
     QVBoxLayout *vbox = new QVBoxLayout;
     QHBoxLayout *hbox = new QHBoxLayout;
 
+    saveLineEdit->setReadOnly(true);
 
     hbox->addWidget(saveLineEdit);
     hbox->addWidget(navSaveButton);
     vbox->addLayout(hbox);
-    vbox->addWidget(saveButton);
 
     saveGroupBox->setLayout(vbox);
 }
@@ -159,9 +155,6 @@ void WidgetImage::createOutputGroupBox()
 
 void WidgetImage::createConnection()
 {
-    connect(loadButton, SIGNAL(clicked()), this, SLOT(loadButtonClicked()));
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClicked()));
-
     connect(launchButton, SIGNAL(clicked()), this, SLOT(launchButtonClicked()));
 
     connect(navLoadButton, SIGNAL(clicked()), this, SLOT(navLoadButtonClicked()));
@@ -170,29 +163,13 @@ void WidgetImage::createConnection()
 
 void WidgetImage::navLoadButtonClicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
-    if(!fileName.isEmpty()){
-        loadLineEdit->setText(fileName);
-    }
-
-}
-
-void WidgetImage::navSaveButtonClicked()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
-    if(!fileName.isEmpty()){
-        saveLineEdit->setText(fileName);
-    }
-}
-
-void WidgetImage::loadButtonClicked()
-{
-    fileNameInput = loadLineEdit->text();
+    fileNameInput = QFileDialog::getOpenFileName(this, "Open Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
 
     if(fileNameInput.isEmpty()){
         QMessageBox::information(this, "Erreur : pas d'image", "Veuillez indiquez où se situe l'image à charger");
     }
     else{
+        loadLineEdit->setText(fileNameInput);
         inputImage->load(fileNameInput);
         if(inputImage->isNull()){
            QMessageBox::information(this, "Chargement de l'image", "Chargemeent impossible de l'image "+fileNameInput);
@@ -201,6 +178,24 @@ void WidgetImage::loadButtonClicked()
             if(!inputGroupBox->isVisible())
                 inputGroupBox->show();
             inputLabel->setPixmap(QPixmap::fromImage(*inputImage));
+        }
+    }
+}
+
+void WidgetImage::navSaveButtonClicked()
+{
+    if(outputImage->isNull()){
+        QMessageBox::information(this, "Erreur pas d'image", "Il n'y a pas d'image à sauvegarder");
+    }
+    else{
+        QString fileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
+        if(fileName.isEmpty()){
+            QMessageBox::information(this, "Erreur pas de fichier", "Veuillez indiquez où enregistrer l'image");
+        }
+        else{
+            saveLineEdit->setText(fileName);
+            outputImage->save(fileName);
+            QMessageBox::information(this, "Information", "Votre image a bien été sauvegardée");
         }
     }
 }
@@ -214,7 +209,7 @@ void WidgetImage::launchButtonClicked()
         Controller *controller = new Controller;
         // pas d'informations saisis par l'utilisateur
         if(!infoGroupBox->isChecked()){
-            outputImage = controller->changeDetails(fileNameInput, raiseCheckBox->isChecked());
+            controller->changeDetails(fileNameInput, raiseCheckBox->isChecked(), *outputImage);
             outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
         }
         else{
@@ -249,7 +244,8 @@ void WidgetImage::launchButtonClicked()
                     controller->setAlpha(alpha);
                 if(beta!=0.0)
                     controller->setBeta(beta);
-                outputImage = controller->changeDetailsUser(fileNameInput, raiseCheckBox->isChecked());
+
+                controller->changeDetailsUser(fileNameInput, raiseCheckBox->isChecked(), *outputImage);
                 outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
             }
 
@@ -260,19 +256,3 @@ void WidgetImage::launchButtonClicked()
     }
 }
 
-void WidgetImage::saveButtonClicked()
-{
-    if(outputImage->isNull()){
-        QMessageBox::information(this, "Erreur pas d'image", "Il n'y a pas d'image à sauvegarder");
-    }
-    else{
-        QString fileName = saveLineEdit->text();
-        if(fileName.isEmpty()){
-            QMessageBox::information(this, "Erreur pas de fichier", "Veuillez indiquez où enregistrer l'image");
-        }
-        else{
-            outputImage->save(fileName);
-            QMessageBox::information(this, "Information", "Votre image a bien été sauvegardée");
-        }
-    }
-}

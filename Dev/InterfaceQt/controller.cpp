@@ -11,7 +11,7 @@ float Controller::betaRaise = 3;
 float Controller::alphaLower = 1;
 float Controller::betaLower = 0.5;
 
-QImage* Controller::changeDetails(QString fileNameInput, bool detail)
+void Controller::changeDetails(QString fileNameInput, bool detail, QImage &image)
 {
     CImg<double> imgInput(fileNameInput.toStdString().c_str());
     CImg<double> imgOutput;
@@ -32,16 +32,14 @@ QImage* Controller::changeDetails(QString fileNameInput, bool detail)
     QFileInfo fileInput(fileNameInput);
     QString fileNameOutput = fileInput.path() +"fb_"+fileInput.fileName();
     CImg<double> (imgOutput.save(fileNameOutput.toStdString().c_str()));
-    QImage *img = new QImage;
-    img->load(fileNameOutput);
+
+    image.load(fileNameOutput);
 
     QFile fileOutput(fileNameOutput);
     fileOutput.remove();
-
-    return img;
 }
 
-QImage* Controller::changeDetailsUser(QString fileNameInput, bool detail){
+void Controller::changeDetailsUser(QString fileNameInput, bool detail, QImage &image){
     CImg<double> imgInput(fileNameInput.toStdString().c_str());
     CImg<double> imgOutput;
 
@@ -67,13 +65,10 @@ QImage* Controller::changeDetailsUser(QString fileNameInput, bool detail){
     QFileInfo fileInput(fileNameInput);
     QString fileNameOutput = fileInput.path() +"fb_"+fileInput.fileName();
     CImg<double> (imgOutput.save(fileNameOutput.toStdString().c_str()));
-    QImage *img = new QImage;
-    img->load(fileNameOutput);
+    image.load(fileNameOutput);
 
     QFile fileOutput(fileNameOutput);
-//    fileOutput.remove();
-
-    return img;
+    fileOutput.remove();
 }
 
 CImg<double> Controller::constructNewImage(CImg<double>& imgInput)
@@ -112,7 +107,7 @@ CImg<double> Controller::bilateralFilter(CImg<double> img, float sigma){
 
     start = clock();
     CImg<double> fbImg = fb.applyFilter();
-    temps = (double) (start - clock())/(double) CLOCKS_PER_SEC;
+    temps = (double) (clock() - start)/(double) CLOCKS_PER_SEC;
 
     cout << "Temps d'éxécution : " << temps << "s" <<endl;
     cout << "<<<<<FILTRE BILATERAL FIN" << endl;

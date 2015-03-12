@@ -40,9 +40,7 @@ class WidgetImage : public QWidget
     private slots:
         void navLoadButtonClicked();
         void navSaveButtonClicked();
-        void loadButtonClicked();
         void launchButtonClicked();
-        void saveButtonClicked();
 
     private:
         void createLoadGroupBox();
@@ -73,10 +71,8 @@ class WidgetImage : public QWidget
         QLineEdit *betaLineEdit;
 
         QPushButton *navLoadButton;
-        QPushButton *loadButton;
         QPushButton *launchButton;
         QPushButton *navSaveButton;
-        QPushButton *saveButton;
 
         QCheckBox *raiseCheckBox;
         QCheckBox *lowCheckBox;

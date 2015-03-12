@@ -16,8 +16,8 @@ class Controller
         Controller():nbIteration(iteration),alpha(0.0), beta(0.0),sigmaS(fsigmaS), sigmaR(fsigmaR){}
         ~Controller(){}
 
-        QImage* changeDetails(QString fileName, bool detail);
-        QImage* changeDetailsUser(QString fileName, bool detail);
+        void changeDetails(QString fileName, bool detail, QImage &image);
+        void changeDetailsUser(QString fileName, bool detail, QImage &image);
 
         int getNbIteration(){return nbIteration;}
         void setNbIteration(int value){nbIteration = value;}
