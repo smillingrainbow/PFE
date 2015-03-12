@@ -19,7 +19,7 @@ double FilterBilateral::distanceEuclidienne(int xP, int yP, int xQ, int yQ){
 
 CImg< double > FilterBilateral::applyFilter(){
     CImg<double> bfImg;
-    cout << "Nombre de canaux de l'image : " << img.spectrum() << endl;
+//    cout << "Nombre de canaux de l'image : " << img.spectrum() << endl;
     // image en niveau de gris
     if(img.spectrum() == 1){
         bfImg = applyFilterNdG();

@@ -47,7 +47,7 @@ QImage* Controller::changeDetailsUser(){
 
 CImg<double> Controller::constructNewImage(CImg<double>& imgInput)
 {
-    cout << "==========CONSTRUCT NEW IMAGE DEBUT==========" << endl;
+//    cout << "==========CONSTRUCT NEW IMAGE DEBUT==========" << endl;
 
     CImg<double> gImg(imgInput.width(), imgInput.height(), imgInput.depth(), imgInput.spectrum(),0);
 
@@ -58,33 +58,33 @@ CImg<double> Controller::constructNewImage(CImg<double>& imgInput)
     float sigma = sigmaR;
 
     for(int i=0; i<nbIteration; i++){
-        cout<< "Iteration : " << i << endl;
+//        cout<< "Iteration : " << i << endl;
         base.insert(bilateralFilter(base(i), sigma), i+1);
         detail.insert(base(i) - base(i+1), i);
         gImg += (beta*(i+1) *detail(i));
         sigma *= 2;
     }
     gImg += (alpha*base(nbIteration));
-    cout << "==========CONSTRUCT NEW IMAGE FIN==========" << endl;
+//    cout << "==========CONSTRUCT NEW IMAGE FIN==========" << endl;
 
     return gImg.get_cut(0,255);
 }
 
 
 CImg<double> Controller::bilateralFilter(CImg<double> img, float sigma){
-    double temps;
-    clock_t start;
+//    double temps;
+//    clock_t start;
 
     FilterBilateral fb(sigmaS, sigma, img);
-    cout<< ">>>>>FILTRE BILATERAL DEBUT" << endl;
-    cout << "Sigma S : " << sigmaS << " Sigma R : " << sigma << endl;
+//    cout<< ">>>>>FILTRE BILATERAL DEBUT" << endl;
+//    cout << "Sigma S : " << sigmaS << " Sigma R : " << sigma << endl;
 
-    start = clock();
+//    start = clock();
     CImg<double> fbImg = fb.applyFilter();
-    temps = (double) (clock() - start)/(double) CLOCKS_PER_SEC;
+//    temps = (double) (clock() - start)/(double) CLOCKS_PER_SEC;
 
-    cout << "Temps d'éxécution : " << temps << "s" <<endl;
-    cout << "<<<<<FILTRE BILATERAL FIN" << endl;
+//    cout << "Temps d'éxécution : " << temps << "s" <<endl;
+//    cout << "<<<<<FILTRE BILATERAL FIN" << endl;
 
     return CImg<double> (fbImg.get_cut(0,255));
 }
