@@ -3,7 +3,7 @@
 using namespace cimg_library;
 using namespace std;
 
-int Controller::iteration = 1;
+int Controller::iteration = 3;
 float Controller::fsigmaS = 60.0;
 float Controller::fsigmaR = 15.0;
 float Controller::alphaRaise = 0.8;

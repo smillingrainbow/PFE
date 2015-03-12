@@ -163,7 +163,7 @@ void WidgetImage::createConnection()
 
 void WidgetImage::navLoadButtonClicked()
 {
-    fileNameInput = QFileDialog::getOpenFileName(this, "Open Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
+    fileNameInput = QFileDialog::getOpenFileName(this, "Open Image", QDir::homePath(), "Images (*.png *.jpg *.tif)");
 
     if(fileNameInput.isEmpty()){
         QMessageBox::information(this, "Erreur : pas d'image", "Veuillez indiquez où se situe l'image à charger");
@@ -189,7 +189,7 @@ void WidgetImage::navSaveButtonClicked()
         QMessageBox::information(this, "Erreur pas d'image", "Il n'y a pas d'image à sauvegarder");
     }
     else{
-        QString fileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
+        QString fileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::homePath(), "Images (*.png *.jpg *.tif)");
         if(fileName.isEmpty()){
             QMessageBox::information(this, "Erreur pas de fichier", "Veuillez indiquez où enregistrer l'image");
         }
