@@ -11,34 +11,6 @@ float Controller::betaRaise = 3;
 float Controller::alphaLower = 1;
 float Controller::betaLower = 0.5;
 
-void Controller::changeDetails(QImage &image)
-{
-    CImg<double> imgInput(fileNameInput.toStdString().c_str());
-    CImg<double> imgOutput;
-
-    // rehaussement
-    if(detail){
-        alpha = alphaRaise;
-        beta = betaRaise;
-    }
-    // attenuation
-    else{
-        alpha = alphaLower;
-        beta = betaLower;
-    }
-    imgOutput = constructNewImage(imgInput);
-    imgOutput.get_cut(0,255);
-
-    QFileInfo fileInput(fileNameInput);
-    QString fileNameOutput = fileInput.path() +"fb_"+fileInput.fileName();
-    CImg<double> (imgOutput.save(fileNameOutput.toStdString().c_str()));
-
-    image.load(fileNameOutput);
-
-    QFile fileOutput(fileNameOutput);
-    fileOutput.remove();
-}
-
 QImage* Controller::changeDetailsUser(){
     CImg<double> imgInput(fileNameInput.toStdString().c_str());
     CImg<double> imgOutput;
