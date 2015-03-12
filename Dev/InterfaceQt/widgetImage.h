@@ -14,6 +14,7 @@
 #include <QMessageBox>
 
 #include "controller.h"
+#include "controllerthread.h"
 
 /**
  * @brief Classe du widget principal
@@ -41,6 +42,7 @@ class WidgetImage : public QWidget
         void navLoadButtonClicked();
         void navSaveButtonClicked();
         void launchButtonClicked();
+        void calculTermine(QImage *img);
 
     private:
         void createLoadGroupBox();
@@ -84,6 +86,7 @@ class WidgetImage : public QWidget
         QImage *outputImage;
 
         QString fileNameInput;
+        ControllerThread *cThread;
 };
 
 #endif // WINDOW_H

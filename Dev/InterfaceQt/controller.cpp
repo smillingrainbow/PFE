@@ -11,7 +11,7 @@ float Controller::betaRaise = 3;
 float Controller::alphaLower = 1;
 float Controller::betaLower = 0.5;
 
-void Controller::changeDetails(QString fileNameInput, bool detail, QImage &image)
+void Controller::changeDetails(QImage &image)
 {
     CImg<double> imgInput(fileNameInput.toStdString().c_str());
     CImg<double> imgOutput;
@@ -39,10 +39,10 @@ void Controller::changeDetails(QString fileNameInput, bool detail, QImage &image
     fileOutput.remove();
 }
 
-void Controller::changeDetailsUser(QString fileNameInput, bool detail, QImage &image){
+QImage* Controller::changeDetailsUser(){
     CImg<double> imgInput(fileNameInput.toStdString().c_str());
     CImg<double> imgOutput;
-
+    QImage *image = new QImage;
     // Si l'utilisateur n'a pas saisie les valeurs d'alpha et beta
     // on les modifie avec les valeurs par défaut correspondant au mode
     // de manipulation demandé
@@ -65,10 +65,12 @@ void Controller::changeDetailsUser(QString fileNameInput, bool detail, QImage &i
     QFileInfo fileInput(fileNameInput);
     QString fileNameOutput = fileInput.path() +"fb_"+fileInput.fileName();
     CImg<double> (imgOutput.save(fileNameOutput.toStdString().c_str()));
-    image.load(fileNameOutput);
+    image->load(fileNameOutput);
 
     QFile fileOutput(fileNameOutput);
     fileOutput.remove();
+
+    return image;
 }
 
 CImg<double> Controller::constructNewImage(CImg<double>& imgInput)
