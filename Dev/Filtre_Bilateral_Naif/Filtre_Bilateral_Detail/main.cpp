@@ -10,8 +10,8 @@
 using namespace cimg_library;
 using namespace std;
 
-float facteur_base = 0.8;
-float facteur_detail = 5;
+float facteur_base = 1;
+float facteur_detail = 0.5;
 bool decrease = false;
 
 
@@ -172,8 +172,6 @@ CImg<double> decomposition_Method1_Increase(const CImg<double>& imgOri, string n
 		cout<< "Itération : " << i << endl;
 		base.insert(filtre_bilateralV2(imgOri, fsigmaS, fsigmaR), i+1);
 		detail.insert(base(i) - base(i+1), i);
-// 		gImg += (facteur_detail*detail(i));
-// 		gImg += (pow(1.2, i)-0.5)*detail(i);
 		gImg += (facteur_detail*(i+1) *detail(i));
 		
 		string sigmaS =  to_string(fsigmaS);
