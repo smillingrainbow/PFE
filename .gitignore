@@ -31,3 +31,5 @@ QT_TP/
 *.snm
 Dev/Doc/
 Dev/build-InterfaceQt-Desktop-Debug/
+Fast_Bilateral_Filter/
+
