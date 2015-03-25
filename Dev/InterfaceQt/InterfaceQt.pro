@@ -24,5 +24,3 @@ HEADERS  += mainwindow.h \
     controller.h \
     widgetImage.h
 
-FORMS    += mainwindow.ui \
-    window.ui
