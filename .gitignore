@@ -31,3 +31,16 @@ QT_TP/
 *.snm
 Dev/Doc/
 Dev/build-InterfaceQt-Desktop-Debug/
+COLOR_BILATERAL_FILTER/
+Rapport/
+Image/
+presentation/
+Rendu/
+Gantt/
+InterfaceDesign/
+fichiersPFE/
+rapport_et_specif(Latex)/
+*.png
+*.jpg
+*.tif
+*.ppm
