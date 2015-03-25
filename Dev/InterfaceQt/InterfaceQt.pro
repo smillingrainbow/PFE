@@ -16,11 +16,13 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     filterbilateral.cpp \
     controller.cpp \
-    widgetImage.cpp
+    widgetImage.cpp \
+    controllerthread.cpp
 
 HEADERS  += mainwindow.h \
     filterbilateral.h \
     CImg.h \
     controller.h \
-    widgetImage.h
+    widgetImage.h \
+    controllerthread.h
 

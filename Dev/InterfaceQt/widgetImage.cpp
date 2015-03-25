@@ -163,7 +163,7 @@ void WidgetImage::createConnection()
 
 void WidgetImage::navLoadButtonClicked()
 {
-    fileNameInput = QFileDialog::getOpenFileName(this, "Open Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
+    fileNameInput = QFileDialog::getOpenFileName(this, "Open Image", QDir::homePath(), "Images (*.png *.jpg *.tif)");
 
     if(fileNameInput.isEmpty()){
         QMessageBox::information(this, "Erreur : pas d'image", "Veuillez indiquez où se situe l'image à charger");
@@ -172,13 +172,14 @@ void WidgetImage::navLoadButtonClicked()
         loadLineEdit->setText(fileNameInput);
         inputImage->load(fileNameInput);
         if(inputImage->isNull()){
-           QMessageBox::information(this, "Chargement de l'image", "Chargemeent impossible de l'image "+fileNameInput);
+           QMessageBox::information(this, "Chargement de l'image", "Chargement impossible de l'image "+fileNameInput);
         }
         else{
             if(!inputGroupBox->isVisible())
                 inputGroupBox->show();
             inputLabel->setPixmap(QPixmap::fromImage(*inputImage));
         }
+
     }
 }
 
@@ -188,7 +189,7 @@ void WidgetImage::navSaveButtonClicked()
         QMessageBox::information(this, "Erreur pas d'image", "Il n'y a pas d'image à sauvegarder");
     }
     else{
-        QString fileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::currentPath(), "Images (*.png *.jpg *.tif)");
+        QString fileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::homePath(), "Images (*.png *.jpg *.tif)");
         if(fileName.isEmpty()){
             QMessageBox::information(this, "Erreur pas de fichier", "Veuillez indiquez où enregistrer l'image");
         }
@@ -207,10 +208,17 @@ void WidgetImage::launchButtonClicked()
     }
     else{
         Controller *controller = new Controller;
+
         // pas d'informations saisis par l'utilisateur
         if(!infoGroupBox->isChecked()){
-            controller->changeDetails(fileNameInput, raiseCheckBox->isChecked(), *outputImage);
-            outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
+            controller->setFileNameInput(fileNameInput);
+            controller->setDetail(raiseCheckBox->isChecked());
+            cThread = new ControllerThread(*controller);
+            connect(cThread, SIGNAL(complete(QImage*)), this, SLOT(calculTermine(QImage*)));
+            cThread->start();
+
+//            controller->changeDetails(fileNameInput, raiseCheckBox->isChecked(), *outputImage);
+//            outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
         }
         else{
             bool nbIterationBool=true, sigmaSBool=true,sigmaRBool=true, alphaBool=true, betaBool=true;
@@ -234,6 +242,8 @@ void WidgetImage::launchButtonClicked()
                 QMessageBox::information(this, "Erreur de parmètre(s)", "Veuillez saisir des paramètres valides");
             }
             else{
+                controller->setFileNameInput(fileNameInput);
+                controller->setDetail(raiseCheckBox->isChecked());
                 if(nbIteration!=0)
                     controller->setNbIteration(nbIteration);
                 if(sigmaS!=0.0)
@@ -245,8 +255,11 @@ void WidgetImage::launchButtonClicked()
                 if(beta!=0.0)
                     controller->setBeta(beta);
 
-                controller->changeDetailsUser(fileNameInput, raiseCheckBox->isChecked(), *outputImage);
-                outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
+                cThread = new ControllerThread(*controller);
+                connect(cThread, SIGNAL(complete(QImage*)), this, SLOT(calculTermine(QImage*)));
+                cThread->start();
+//                controller->changeDetailsUser(fileNameInput, raiseCheckBox->isChecked(), *outputImage);
+//                outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
             }
 
         }
@@ -256,3 +269,9 @@ void WidgetImage::launchButtonClicked()
     }
 }
 
+void WidgetImage::calculTermine(QImage *img){
+//    cThread->quit();
+//    cThread->wait();
+    outputImage = new QImage(*img);
+    outputLabel->setPixmap(QPixmap::fromImage(*outputImage));
+}
