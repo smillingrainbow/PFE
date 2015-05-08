@@ -33,11 +33,13 @@ public:
 	FiltreBilateral(float fsigmaS, float fsigmaR, const cimg_library::CImg<double> &input);
 	FiltreBilateral(const cimg_library::CImg<double> &input);
 	cimg_library::CImg<double> applyFilter();
-	cimg_library::CImg<double> applyFilterV2();
+	cimg_library::CImg<double> applyFilterNdG();
+	cimg_library::CImg<double> applyFilterV3();
+	cimg_library::CImg<double> applyFilterRGB();
 	cimg_library::CImg<double> moyennePixel();
-
+	
 	cimg_library::CImg<double> bruitGaussien(float sigma);
-
+	
 	float get_fSigmaS() {return fSigmaS;}
 	float get_fSigmaR() {return fSigmaR;}
 	cimg_library::CImg<double> get_img() {return img;}
@@ -47,12 +49,12 @@ public:
 	void set_img(cimg_library::CImg<double>& newImg) {img = newImg;}
 	
 private:
-
+	
 	double loiGaussienne(double value, float sigma);
 	double distanceEuclidienne(int xP, int yP, int xQ, int yQ);
 	double distanceScalaire(int xP, int yP, int xQ, int yQ);
 	double transformationBoxMuller(float sigma);
-
+	
 	cimg_library::CImg<double> img;
 	float fSigmaS;
 	float fSigmaR;
