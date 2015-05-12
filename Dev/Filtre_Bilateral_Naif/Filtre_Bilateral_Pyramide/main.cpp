@@ -244,26 +244,7 @@ int main(int argc, char **argv) {
 		cin>> fsigmaR;  
 	}
 	
-	CImg<double> img(nomImg.c_str());
-// 	CImg<double> noiseGauss(img);
-// 	noiseGauss.noise(10);
-	
-// 	CImg<double> fbImg = filtre_bilateral(noiseGauss, nomImg, fsigmaS, fsigmaR);
-	
-// 	CImg<double> fbImg = filtre_bilateral(img, nomImg, fsigmaS, fsigmaR);
-// 	CImg<double> fbImg = filtre_bilateralV2(img, fsigmaS, fsigmaR);
-	
-// 	CImg<double> imgTest(noiseGauss);
-// 	CImg<double> imgTest(img);
-// 	imgTest = imgTest.blur_bilateral(imgTest, fsigmaS, fsigmaR);
-
-
-	
-	
-// 	CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
-// 	CImgDisplay windows_fbTest(imgTest, "Image filtre bilateral CImg");
-
-		
+	CImg<double> img(nomImg.c_str());		
 	
 	CImg<double> recompo = decomposition_Method1(img, nomImg,fsigmaS, fsigmaR, 3);
 	CImgDisplay recompoD(recompo, "Recomposition methode 1");
@@ -276,11 +257,6 @@ int main(int argc, char **argv) {
 	CImg<double>(recompo2.get_cut(0,255)).save(nomImgSave.c_str());
 	
 	CImgDisplay main(img, "Normal");
-	
-// 	cout << "Valeur de diff max : " << comparaisonImageMax(fbImg, imgTest) << endl;
-// 	cout << "Valeur de diff : " << comparaisonEntreImage(fbImg, imgTest) << endl;
-// 	
-// 	cout << "PSNR : " << noiseGauss.PSNR(fbImg) << endl;
 	 
 	while(!main.is_closed()){
 		main.wait();

@@ -155,88 +155,37 @@ double comparaisonEntreImage(const CImg<double> &imgFb, const CImg<double> &imgC
 
 int main(int argc, char **argv) {
 	
-	string nomImg;
-// 	float fsigmaS, fsigmaR;
-// 	
-// 	if(argc == 4){
-// 		nomImg = string(argv[1]);
-// 		fsigmaS = atof(argv[2]);
-// 		fsigmaR = atof(argv[3]);
-// 		
-// 		
-// 	}
-// 	else{
-// 		cout<<"Veuillez saisir le nom de l'image avec son extension (ex: lena.jpg)" << endl;
-// 		cin>> nomImg; 
-// 		
-// 		cout<<"Veuillez saisir la valeur de sigma S."<< endl;
-// 		cin>> fsigmaS;
-// 		
-// 		cout<<"Veuillez saisir la valeur de sigma R (en pourcentage)."<< endl;
-// 		cin>> fsigmaR;  
-// 	}
+	float fsigmaS, fsigmaR;
 	
-	
-	
-	string nomFichier = "resultatStat.txt";
-	ofstream fichier(nomFichier.c_str(), ios::app);
-	
-// 	CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
-// 	CImgDisplay windows_fbTest(fbCImg, "Image filtre bilateral CImg");
-// 
-// 	CImgDisplay main(img, "Normal");
-	
-	nomImg = "tulip.ppm";
-	
-	CImg<double> img(nomImg.c_str());
-	CImg<double> noiseGauss(img);
-	noiseGauss.noise(10);
-	
-	for(float fsigmaS = 4; fsigmaS <=64 ; fsigmaS*=2){
-		for(float fsigmaR = 20; fsigmaR <= 60; fsigmaR+=10){
-			CImg<double> fbImg = filtre_bilateralV2(noiseGauss, fsigmaS, fsigmaR);
-			CImg<double> fbCImg = noiseGauss.get_blur_bilateral(noiseGauss, fsigmaS, fsigmaR);
-			
-			double diffPixel = comparaisonImageMax(fbImg, fbCImg);
-			double diffImage = comparaisonEntreImage(fbImg, fbCImg);
-			
-			if(fichier){
-				fichier << nomImg << "\t" << fsigmaS <<  "\t" << fsigmaR << "\t" << diffPixel << "\t" << diffImage << endl;
-			}
-			cout << "Valeur de diff max : " << diffPixel << endl;
-			cout << "Valeur de diff : " << diffImage << endl;
-		}
+	if(argc == 4){
+		nomImg = string(argv[1]);
+		fsigmaS = atof(argv[2]);
+		fsigmaR = atof(argv[3]);
+		
+		
+	}
+	else{
+		cout<<"Veuillez saisir le nom de l'image avec son extension (ex: lena.jpg)" << endl;
+		cin>> nomImg; 
+		
+		cout<<"Veuillez saisir la valeur de sigma S."<< endl;
+		cin>> fsigmaS;
+		
+		cout<<"Veuillez saisir la valeur de sigma R (en pourcentage)."<< endl;
+		cin>> fsigmaR;  
 	}
 	
-	nomImg = "flower.ppm";
 	
-	CImg<double> img2(nomImg.c_str());
-	CImg<double> noiseGauss2(img2);
-	noiseGauss2.noise(10);
+	CImgDisplay windows_fb(fbImg, "Image filtre bilateral");
+	CImgDisplay windows_fbTest(fbCImg, "Image filtre bilateral CImg");
+
+	CImgDisplay main(img, "Normal");
 	
-	for(float fsigmaS = 4; fsigmaS <=64 ; fsigmaS*=2){
-		for(float fsigmaR = 20; fsigmaR <= 60; fsigmaR+=10){
-			CImg<double> fbImg = filtre_bilateralV2(noiseGauss2, fsigmaS, fsigmaR);
-			CImg<double> fbCImg = noiseGauss2.get_blur_bilateral(noiseGauss2, fsigmaS, fsigmaR);
-			
-			double diffPixel = comparaisonImageMax(fbImg, fbCImg);
-			double diffImage = comparaisonEntreImage(fbImg, fbCImg);
-			
-			if(fichier){
-				fichier << nomImg << "\t" << fsigmaS <<  "\t" << fsigmaR << "\t" << diffPixel << "\t" << diffImage << endl;
-			}
-			cout << "Valeur de diff max : " << diffPixel << endl;
-			cout << "Valeur de diff : " << diffImage << endl;
-		}
-	}
-	
-	fichier.close();
-	
-// 	cout << "PSNR : " << noiseGauss.PSNR(fbImg) << endl;
+
 	 
-// 	while(!main.is_closed()){
-// 		main.wait();
-// 	}
+	while(!main.is_closed()){
+		main.wait();
+	}
 	
 	
 	return 0;
