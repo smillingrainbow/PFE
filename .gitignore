@@ -29,7 +29,6 @@ QT_TP/
 *.ilg
 *.nav
 *.snm
-Dev/Doc/
 Dev/build-InterfaceQt-Desktop-Debug/
 Dev/build-InterfaceQt-Desktop-Release/
 Fast_Bilateral_Filter/
