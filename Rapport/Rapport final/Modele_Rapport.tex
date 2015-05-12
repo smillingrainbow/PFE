@@ -1,0 +1,960 @@
+\documentclass[twoside]{EPURapport}
+\input{include.tex}
+
+\thedocument{Rapport de projet de fin d'études}{Développement d'un outil de traitement d'images par filtrage bilatéral}{Développement d'un outil de traitement d'images}
+
+\grade{Département Informatique\\ 5\ieme{} année\\ 2014 - 2015}
+
+\authors{%
+	\category{Étudiante}{%
+		\name{Natacha \textsc{Marlio-Marette}} \mail{natacha.marlio-marette@etu.univ-tours.fr}
+	}
+	\details{DI5 2014 - 2015}
+}
+
+\supervisors{%
+	\category{Encadrants}{%
+		\name{Moncef \textsc{Hidane}} \mail{moncef.hidane@insa-cvl.fr}
+	}
+	\details{Université François-Rabelais, Tours}
+}
+
+\abstracts{Ce rapport de projet de fin d'études porte sur l'étude du filtre bilatéral. \`A partir de ce filtre, un travail sur la décomposition des images a été fait afin de pouvoir manipuler les détails de celle-ci. Par la suite une IHM permettant à l'utilisateur de pouvoir modifier comme il le souhaite une image a été réalisée. Une autre méthode permettant d'accélérer l'exécution du filtre a été étudiée et ajoutée à l'IHM.}
+{Filtre bilatéral, CImg, Qt, C++, Traitement d'images, Convolution}
+{This graduation report is about the study of the bilateral filter. From this filter, a work on image decomposition was done to be able to manipulate the details from it. Then, a HCI with witch the user can change like he wants an image was created. An other method allowing to accelerate the execution of the filter has been studied and added to HCI.}
+{Bilaterlal filter, CImg, Qt, C++, Image filtering, Convolution}
+
+\begin{document}
+
+
+\chapter{Introduction}
+
+\paragraph{}
+Ce projet de fin d'études a été proposé par Mr. Moncef \textsc{Hidane}, de l'INSA de Blois, en collaboration avec le laboratoire RFAI\footnote{RFAI : Reconnaissance des formes et Analyse d'images} de Polytech Tours. Il porte sur la manipulation des détails d'une image en utilisant un filtre bilatéral permettant de lisser une image tout en conservant les contours des objets de celle-ci. L'objectif est de réaliser une interface permettant à l'utilisateur de pouvoir modifier les détails d'une image soit en les atténuant soit en les réhaussant. 
+
+\paragraph{}
+On peut décomposer ce projet en trois grandes parties. La première partie consiste en la mise en oeuvre d'une méthode de manipulation des détails d'une image par décomposition obtenue par filtrage bilatéral itératif. La deuxième partie porte sur la conception et implémentation d'une interface. Et enfin la dernière partie consistera à étudié une approximation rapide basé sur l'interprétation du filtre bilatéral comme une convolution et à l'intégrer dans la partie précédente. 
+
+\paragraph{}
+Tout d'abord sera expliqué en quoi consiste le filtre bilatéral, ces différentes utilisations ainsi que l'implémentation qui en a été faîte. La partie suivante décrira comment cette implémentation du filtre a été validé. Par la suite, je décrirais comment j'ai décomposé puis recomposé une image afin de pouvoir en manipuler ces détails à différents niveaux. De cette partie va découler la description de l'interface, c'est-à-dire comment elle a été conçue et son utilisation. Puis pour finir, le dernier chapitre est consacré à une méthode permettant d'accélérer l'exécution du filtre en changeant d'espace et utilisant une convolution gaussienne. 
+
+\paragraph{}
+Je tiens à remercier mon encadrant Mr. Moncef \textsc{Hidane} pour sa disponibilité même lorsqu'il n'était pas présent à l'école. 
+
+
+\chapter{Filtre bilatéral}
+	\section{Définition}
+		\subsection{Filtre bilatéral : définition}
+		
+\paragraph{}
+Le filtre bilatéral\index{Filtre bilatéral} est un filtre non linéaire qui lisse les petites variations d'intensité et préserve les contours des objets. Il supprime les textures, bruits et petits détails tout en conservant les formes des objets mais sans flouter. Cette technique remonte à 1995 avec le travail de Aurich et Weule \cite{AurichWeule} sur les filtres gaussien \index{Filtre gaussien} non linéaires. Cela a été redécouvert quelques années plus tard, en 1997, par Smith et Brady \cite{SmithBrady}, puis en 1998 par Tomasi et Manduchi \cite{TomasiManduchi} qui lui ont donné son nom actuel.
+
+\paragraph{}
+La formulation de ce filtre est relativement simple. Chaque pixel est remplacé par une moyenne pondérée de ses voisins. Il ne dépend que deux paramètres qui indiquent la taille et le contraste des caractéristiques à conserver.
+		
+		\subsection{Notations et terminologies}
+		
+\paragraph{}
+Soit $I$ une image en niveau de gris mais chaque opération du filtre peut être dupliqué sur chaque composante dans le cas d'une image en couleur. On note $I_p$ la valeur du pixel à la position $p$. $F[I]$ désigne la sortie du filtre $F$ appliqué à l'image $I$. On considère $S$ l'ensemble de toutes les emplacements possibles de l'image que l'on nomme le domaine spatial et $R$ l'ensemble de toutes les valeurs des pixels possibles que l'on nomme le domaine d'intensité. La notation $\sum_{p\in S}$ correspond à la somme de tous les pixels de $S$. On utilise $\mid \cdot \mid $ pour la valeur absolue et $\parallel \cdot \parallel $ pour la norme c'est à dire que $\parallel p-q \parallel $ représente la distance euclidienne entre la position des pixels $p$ et $q$.
+		
+		\subsection{Formulation du filtre Gaussien} \label{ssec:Gauss}
+		
+\paragraph{}
+La façon la plus simple de lisser une image est sûrement de la flouter (voir image~\ref{fig:gauss}). La valeur de chaque pixel est remplacée par une somme pondérée de ses voisins. Le filtre gaussien \index{Filtre gaussien} est principalement basé sur la convolution gaussienne et utilise une fonction gaussienne $G_{\sigma}(x) $ (eq.\eqref{eq:gauss}). Une image filtrée par convolution gaussienne est donnée par la formule suivante : 
+\begin{equation}
+	GC[I]_p = \sum_{q\in S}G_{\sigma}(\parallel p-q \parallel ) I_q 
+\end{equation}
+
+\begin{equation}
+\label{eq:gauss}
+	G_{\sigma}(x) = \frac{1}{2\pi \sigma^{2}} \exp \left(-\frac{x^2}{2\sigma^2}\right)
+\end{equation}
+
+\paragraph{}
+Avec ce filtre, on calcule la moyenne pondérée de l'intensité des pixels adjacents avec un poids qui décroît en fonction de la distance avec le pixel $p$. Le poids du pixel $q$ est défini par la fonction gaussienne $G_{\sigma}(\parallel p-q \parallel)$ où $\sigma$ est un paramètre qui défini la taille du voisinage. La valeur des pixels n'a pas d'influence dans la moyenne pondérée seulement leur position. La convolution gaussienne est indépendante du contenu de l'image. 
+
+\begin{figure}
+        \centering
+        \includegraphics[scale=0.7]{images/gaussFlower.png}
+        \caption[Exemple de filtre gaussien]{Exemple de filtre gaussien avec différentes valeur de $\sigma$. Image originale en haut à gauche}
+        \label{fig:gauss}
+\end{figure}
+		
+		\subsection{Formulation du filtre bilatéral}\label{ssec:FormFB}
+
+\paragraph{}
+Le filtre bilatéral \index{Filtre bilatéral} est défini d'une manière similaire au filtre gaussien comme une moyenne pondérée des pixels environnants, à la différence que celui-ci tient compte des valeurs des pixels afin de préserver le contour des formes. Pour qu'un pixel influence un autre pixel, il ne doit pas seulement être proche spatialement mais aussi proche en intensité. Ce filtre, noté $BF[\cdot]$, est défini par : 
+\begin{equation}
+\label{eq:fb}
+	BF[I]_p = \frac{1}{W_p}\sum_{q\in S} G_{\sigma_s}(\parallel p- q \parallel)G_{\sigma_r}(\mid I_p - I_q \mid) I_q
+\end{equation}
+où $W_p$ est un facteur de normalisation : 
+\begin{equation}
+\label{eq:Wp}
+	W_p = \sum_{q\in S} G_{\sigma_s}(\parallel p- q \parallel)G_{\sigma_r}(\mid I_p - I_q \mid)
+\end{equation}
+ 
+\paragraph{}
+Les paramètres $\sigma_s$ et $\sigma_r$ définissent le niveau de filtrage de l'image. L'équation \eqref{eq:fb} définissant le filtre est une moyenne pondérée normalisée où $G_{\sigma_s}$ est une pondération gaussienne spatiale qui diminue l'influence des pixels distants et $G_{\sigma_r}$ est une gausienne d'intensité qui diminue l'influence des pixels $q$ si leur intensité diffère de celle de $I_p$. 
+
+\paragraph{}
+Plus le paramètre $\sigma_r$ est grand plus le filtre s'approche d'une convolution gaussienne c'est à dire du filtre gaussien. 
+	
+	
+	\section{Implémentation}\label{sec:implementationFB}
+		\subsection{Algorithme général}
+		
+\paragraph{}	
+L'influence de pixel éloigné spatialement diminuant, on considère que l'ensemble $S$ est un masque carré avec pour centre le pixel $p$. Ce masque est relativement petit, ici dans nos implémentations,  il ne fait que 21x21 pixels de large. Il n'y a pas besoin de parcourir l'image entière dans le but d'obtenir la moyenne pondérée car plus les pixels sont éloignés spatialement moins ils ont d'influence. On peut donc considérer qu'ils sont négligeables. 
+Si le masque doit déborder de l'image, les pixels étant en dehors de celle-ci seront considérés comme nul. \newline
+
+\begin{algorithm}[H] \index{Filtre bilatéral}
+	\DontPrintSemicolon
+	\Entree{Image $I$}
+	\Sortie{Image filtrée $BF[I]$}
+	\BlankLine
+	\Pour{$p \in I$ }{
+		\tcp{Initialisation}
+		$BF[I]_p = 0$ \;
+		$W_p = 0$ \;
+		\Pour{$q \in S$}{
+			$w = G_{\sigma_s}(\parallel p-q \parallel)G_{\sigma_r}(\mid I_p - Iq \mid) $ \;
+			$BF[I]_p += wI_q $ \;
+			$ W_p += w$ \;
+		}
+		\tcp{Normalisation}
+		$BF[I]_p = I_p / W_p $  
+	}
+\caption{Algorithme général du filtre bilatéral}
+\label{alg:FBg}
+\end{algorithm}
+
+		\subsection{Image RGB et luminance}
+		
+\paragraph{}		
+L'algorithme (alg~\ref{alg:FBg})précédent peut être appliqué à des images en couleur. Pour cela, il faut itérer le filtre pour chaque composante couleur de l'image. La gaussienne d'intensité $G_{\sigma_r}$ ne prendra compte que de la composante couleur en cours dans son calcul pas des autres. 
+
+\paragraph{}
+Dans le but d'optimiser l'exécution du filtre, on peut passer par la luminance\index{Luminance}, cela permet d'éviter de devoir parcourir chaque canal de couleur de l'image. La luminance correspond à la sensation visuelle de luminosité d'une image. C'est une grandeur photométrique qui est dépendante de l'\oe il humain. Il existe différents espaces colorimétriques\index{Espace colorimétrique} prenant en compte la luminance tel que CIE XYZ, xyY ou YCbCr\index{YCbCr}. Dans ces espaces, la luminance est représentée par la variable Y. Dans notre implémentation du filtre bilatéral pour des images RGB, l'espace colorimétrique YCbCr est utilisé.
+
+\paragraph{}
+L'espace YCbCr est principalement utilisé pour la vidéo que celle-ci soit en noir et blanc ou bien en couleur. Y représente le signal de luminance (noir et blanc). \`A ce signal, on ajoute deux composantes : Cb (le bleu moins Y) et Cr (le rouge moins Y). Il est très facile de passer d'un espace YCbCr à un espace RGB\index{RGB}. La seule composante qu'il manque afin de changer d'espace est le vert. Cette composante peut être retrouvée mathématiquement avec Y(rouge+vert+bleu), Cb et Cr.
+
+\paragraph{}
+Afin de passer des composantes RGB d'une image à celle de YCbCr, on utilise les formules suivantes \footnote{Les formules de conversion RGB/YCbCR sont celles utilisées dans la librairie CImg \cite{cimg}} : 
+\begin{align}
+	Y &= \frac{66R + 129G +25B+ 128}{256} + 16 \\
+	Cb &= \frac{-38R -74G +112B +128}{256} + 128 \\
+	Cr &= \frac{112R - 94G - 18b + 128}{256} + 128	
+\end{align}
+
+\paragraph{}
+La conversion dans le sens inverse est faîte avec les équations suivantes : 
+\begin{align}
+	R &= \frac{298(Y-16) + 409(Cr-128) + 128}{256} \\
+	G &= \frac{298(Y-16(Cb-100) -208(Cr-128) + 128}{256} \\
+	B &= \frac{298(Y-16) + 516(Cb-128) + 128}{256}
+\end{align}
+
+\paragraph{}
+Dans le cas d'image RGB, l'algorithme \ref{alg:FBg} est peut modifié. Avant de parcourir l'image, on la convertit vers l'espace de luminance YCbCr puis on applique le filtre bilatéral dessus normalement mais uniquement sur la nouvelle composante Y. Ensuite, il n'y a plus qu'à faire basculer l'image de nouveau vers l'espace RGB. On définit $I^{Y}_p$ la valeur du pixel $p$ pour la composante $Y$. Ce qui donne l'algorithme suivant : \newline
+
+\begin{algorithm}[H] \index{Filtre bilatéral}
+	\DontPrintSemicolon
+	\SetKwFunction{RGBtoYCbCr}{RGBtoYCbCr}
+	\SetKwFunction{YCbCrtoRGB}{YCbCrtoRGB}
+	\Entree{Image RGB $I$}
+	\Sortie{Image filtrée $BF[I]$}
+	\BlankLine
+	\tcp{Conversion RGB vers YCbCr}
+	$I$ = \RGBtoYCbCr{$I$} \;
+	\Pour{$p \in I$ }{
+		\tcp{Initialisation}
+		$BF[I]^{Y}_p = 0$ \;
+		$W_p = 0$ \;
+		\Pour{$q \in S$}{
+			$w = G_{\sigma_s}(\parallel p-q \parallel)G_{\sigma_r}(\mid I^{Y}_p - I^{Y}q \mid) $ \;
+			$BF[I]^{Y}_p += wI^{Y}_q $ \;
+			$ W^{Y}_p += w$ \;
+		}
+		\tcp{Normalisation}
+		$BF[I]^{Y}_p = I^{Y}_p / W^{Y}_p $  
+	}
+	\tcp{Conversion YCbCr vers RGB}
+	$BF[I]$ = \YCbCrtoRGB{$BF[I]$}
+\caption{Algorithme du filtre bilatéral pour des images RGB}
+\label{alg:FBrgb}
+\end{algorithm}
+		
+	\section{Applications}
+
+\paragraph{}
+Le filtre bilatéral est utilisé dans divers domaines et pour différents types d'utilisation. Ci-dessous une partie de ces applications sont présentées.
+
+\subsubsection{Débruitage}\label{sssec:debruitage}
+
+\paragraph{}\index{Débruitage} 
+Le premier but du filtre bilatéral\index{Filtre bilatéral} lorsqu'il a été crée était l'utilisation comme outil de débruitage pour les images. L'avantage de ce filtre par rapport au filtre gaussien\index{Filtre gaussien} est qu'il va en plus de lisser l'image conserver sa structure comme le montre l'image ci-dessous.
+
+\begin{figure}[H]
+        \centering
+        \subfloat[Image originale]{\includegraphics[scale=0.5]{images/lena.png} }
+
+        \subfloat[Image bruitée (sel et poivre)]{\label{subfig:imgBruit} \includegraphics[scale=0.5]{images/lenaNoise.png}}
+        ~
+        % sigma = 3
+        \subfloat[Filtre gaussien]{ \includegraphics[scale=0.5]{images/lenaGauss.png}}
+        ~
+        % sigmaS =15 sigmaR = 15
+        \subfloat[Filtre bilatéral]{\label{subfig:FBbruitLena} \includegraphics[scale=0.5]{images/lenaFB.png}}
+        \caption[Comparaison de filtres en débruitage]{Comparaison de débruitage entre le filtre gaussien et le filtre bilatéral à partir de l'image \subref{subfig:imgBruit}. On remarque que les contours sont conservés avec le filtre bilatéral \subref{subfig:FBbruitLena}.}
+\end{figure}
+
+
+\subsubsection{Outils de gestion de contrastes}
+\paragraph{}
+Le filtre bilatéral peut servir d'outil à la manipulation de détails afin de les améliorer ou les atténuer (voir section \ref{sec:ManipDetails} page \pageref{sec:ManipDetails}). Une des applications les plus connue est certainement en photographie avec la technologie HDR\footnote{HDR : High Dinamic Range}. Cette technologie permet de construire une nouvelle image à partir d'une série de photos avec des expositions différentes (fig.~\ref{fig:HDR}). Cela permet d'obtenir tous les détails de la scène. 
+\newpage
+\begin{figure}[H]
+\centering
+	\subfloat[Six prises de vue avec des expositions différentes (1/40 1/10 1/2 1\? 6\? 25\?)]{\label{subfig:HDR_vues} \includegraphics[scale=0.5]{images/HDRI-Example.jpg}}
+	
+	\subfloat[Image crée avec la technologie HDR]{ \label{subfig:HDR_reconstruite} \includegraphics[scale=0.5]{images/Old_saint_pauls_1.jpg}}
+	
+	\caption[Reconstruction d'une image  à partir de photos avec des expositions différentes]{Reconstruction d'une image \subref{subfig:HDR_reconstruite} à partir de photos avec des expositions différentes \subref{subfig:HDR_vues} \cite{hdr}}
+	\label{fig:HDR}
+\end{figure}
+
+\subsubsection{Fusion d'images}
+
+\paragraph{}
+Une autre technique, découverte par Eisemann et Durand\cite{EisemannDurand}, pouvant être utilisé avec le filtre bilatéral est la création d'image à partir d'une photo avec flash et une autre sans (fig.~\ref{fig:FlashPasFlash}). Cela permet d'obtenir des photos de bonne qualité lorsque l'on se trouve dans un environnement avec peu de lumière.
+
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.5]{images/avec-sansFlash.png}
+	\caption{Combinaison d'une image avec flash et d'une image sans flash.}
+	\label{fig:FlashPasFlash}
+\end{figure}
+
+\subsubsection{Autres}
+
+\paragraph{}
+Le filtre bilatéral peut servir dans bien d'autres domaines d'applications, par exemple pour lisser un objet 3D (fig.~\ref{fig:lissage3D}) ou bien pour donner un effet "cartoon" à une vidéo (fig.~\ref{fig:videoCartoon}).
+
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.5]{images/dragon3D.png}
+	\caption{Lissage d'un objet 3D à l'aide du filtre bilatéral}
+	\label{fig:lissage3D}
+\end{figure}
+
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.5]{images/videoCartoon.png}
+	\caption{Effet "cartoon" d'une vidéo}
+	\label{fig:videoCartoon}
+\end{figure}
+
+
+\chapter{Utilisation du filtre bilatéral en débruitage}
+	\section{Mise en place}
+	
+\paragraph{}
+Afin de pouvoir utiliser le filtre bilatéral par la suite avec l'interface, il a fallu tout d'abord valider son implémentation. Pour cela, on va comparer les résultats obtenus entre l'implémentation du filtre dans CImg\index{CImg} et la nôtre en débruitage\index{Débruitage} (voir \ref{sssec:debruitage} p.~\pageref{sssec:debruitage}). 
+
+\paragraph{}
+La validation du filtre bilatéral s'est faite en deux étapes. La première consistait à vérifier que le filtre bilatéral reproduisait correctement le comportement d'un filtre gaussien (voir \ref{ssec:Gauss}). Une valeur grande $\sigma_r$ permet d'approcher une convolution gaussienne car la gaussienne $G_{\sigma_r}$ va tendre vers un et la formule du filtre bilatéral sera donc semblable à celle de la convolution gaussienne. 
+\paragraph{}
+La seconde étape permet de vérifier que les résultats obtenus concordent avec ceux de l'implémentation de CImg. Pour cela deux pourcentages sont calculés : un premier correspondant au maximum de différence entre les valeurs des deux images obtenues (Eq.~\ref{diffPixel}) et un deuxième correspondant à la différence entre les deux valeurs (Eq.~\ref{diffImage}). Ces calculs sont réalisés avec les équations suivantes : 
+
+\begin{equation}\label{diffPixel}
+	diffPixel = \max_{i, y} \frac{\sum\limits_{c}\frac{I_{fb,c} - I_{CImg,c}}{255} * 100}{c} 
+\end{equation}
+\begin{equation}\label{diffImage}
+	diffImage = \frac{\sum\limits_{x} \sum\limits_{y} \sum\limits_{c} \frac{I_{fb,c} - I_{CImg,c}}{255} * 100 }{x*y*c}
+\end{equation}
+
+\paragraph{}
+La comparaison se fait avec des images initiales bruitées par un bruit 	suivant une loi gaussienne. On acceptera un pourcentage de différence entre l'image produite avec CImg et celle produite avec nôtre implémentation d'environ 5\% maximum et un pourcentage entre les valeurs des pixels d'environ 20\% maximum. 
+	
+	\section{Tests et résultats}
+
+\begin{figure}[H]
+	\center
+	\subfloat[Image NdG]{\includegraphics[scale=0.6]{images/flower1.png}}
+	\hspace{5pt}
+	\subfloat[Image RGB]{\includegraphics[scale=0.6]{images/tulip.png}}
+	\caption{Images utilisées pour les tests}
+\end{figure}
+
+\paragraph{} 
+Les tests sur nôtre implémentation du filtre bilatéral en débruitage se sont fait à partir des deux images ci-dessus. Une image en niveau de gris et une image RGB ont été testé afin de comparer les différentes implémentations du filtre et vérifier que le nôtre fonctionne correctement.
+ \paragraph{}
+Afin de comparer le filtre implémenté dans la librairie CImg \index{CImg} et le nôtre, nous les avons testé en faisant varier les paramètres avec différentes valeurs
+\begin{align}
+	\sigma_s = \lbrace 4, 8, 16, 32, 64 \rbrace \nonumber
+\end{align}
+\begin{align}
+	\sigma_r = \lbrace 20, 30, 40, 50, 60\rbrace \nonumber
+\end{align}
+\paragraph{}
+Toutes les combinaisons possibles ont été essayé afin d'obtenir les résultats présents ci-dessous. On remarque que les écarts se creusent si les valeurs des paramètres augmentent. Les écarts entre les images peuvent être diminué en travaillant avec un masque plus grand mais cela ralentirait l'exécution du filtre. Les résultats présentés ci-après sont une moyenne calculée à partir de dix tests. 
+
+\paragraph{}
+Les tests ont été faits dans une machine virtuelle dont voici les caractéristiques : 
+\begin{description}
+	\item Machine hôte
+		\begin{itemize}
+			\item Windows 7 64bits
+			\item 8Go RAM
+			\item \href{http://ark.intel.com/fr/products/39720/Intel-Xeon-Processor-W3550-8M-Cache-3_06-GHz-4_80-GTs-Intel-QPI}{Intel(R)Xeon(R)CPU W3550 @ 3.06GHz}
+		\end{itemize}
+	\item Machine virtuelle
+		\begin{itemize}
+			\item Manjaro 64Bits
+			\item 4Go RAM
+			\item 4 Core
+		\end{itemize}
+\end{description}
+
+
+
+\newpage
+
+  \begin{figure}[H]
+    \center
+    \subfloat[Différence max entre les pixels]{\includegraphics[scale=0.6]{images/debruitageRGBSigmaRDiffPixel.png}}
+    
+	\subfloat[Différence entre les images]{\includegraphics[scale=0.6]{images/debruitageRGBSigmaRDiffImage.png}}
+    \caption{Comparaison avec une image RGB des deux implémentations en faisant varier $\sigma_r$}
+  \end{figure}
+
+	
+\begin{figure}[H]
+	\center
+	\subfloat[Différence max entre les pixels]{\includegraphics[scale=0.6]{images/debruitageNdGSigmaRDiffPixel.png}}
+	
+	\subfloat[Différence entre les images]{\includegraphics[scale=0.6]{images/debruitageNdGSigmaRDiffImage.png}}
+	\caption{Comparaison avec une image en niveau de gris(NdG) des deux implémentations en faisant varier $\sigma_r$}
+\end{figure}
+	
+\begin{figure}[H]
+	\center
+	\subfloat[Différence max entre les pixels]{\includegraphics[scale=0.6]{images/debruitageRGBSigmaSDiffPixel.png}}
+	
+	\subfloat[Différence entre les images]{\includegraphics[scale=0.6]{images/debruitageRGBSigmaSDiffImage.png}}
+	\caption{Comparaison avec une image RGB des deux implémentations en faisant varier $\sigma_s$}
+\end{figure}	
+	
+\begin{figure}[H]
+	\center
+	\subfloat[Différence max entre les pixels]{\includegraphics[scale=0.6]{images/debruitageNdGSigmaSDiffPixel.png}}
+	
+	\subfloat[Différence entre les images]{\includegraphics[scale=0.6]{images/debruitageNdGSigmaSDiffImage.png}}
+	\caption{Comparaison avec une image en niveau de gris(NdG) des deux implémentations en faisant varier $\sigma_s$}
+\end{figure}	
+	
+\chapter{Pyramide multi-échelle à partir du filtre bilatéral} \index{Pyramide multi-échelle}
+	\section{Décomposition et recomposition des images}
+	
+\paragraph{}
+En photographie, il est possible de décomposer une image en : 
+\begin{itemize}
+	\item une couche de base qui contient une grande échelle de variations de l'intensité
+	\item et une couche de détails à petite échelle qui contient tous les petits détails de l'image.
+\end{itemize}
+Afin de pouvoir manipuler les détails d'une image, il faut tout d'abord la décomposer.  Pour cela, une pyramide multi-échelle est réalisée à partir du filtre bilatéral ce qui va permettre d'obtenir une succession d'images filtrées. Chaque image obtenue correspond à une combinaison de vecteurs (la couche de base et le couche de détails) comme sur l'image ci-dessous.
+
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.5]{images/decompo.png}
+	\caption[Combinaison vectorielle de la décomposition d'une image]{Combinaison vectorielle de la décomposition d'une image en itérant le filtre bilatéral}
+	\label{fig:decompo}
+\end{figure}
+
+\paragraph{}
+En appliquant le filtre bilatéral sur une image, on peut la décomposer ensuite en une couche de base, c'est à dire l'image résultant du filtre et une couche de détails qui correspond à la différence entre l'image originale et la couche de base (voir fig.~\ref{fig:decompositionBaseDetails}).
+chem
+
+\paragraph{}
+On notera \textit{g} l'image originale, \textit{u} la couche de base et \textit{v} correspondra à la couche de détails. \textit{BF[$\cdot$]} désigne le filtre bilatéral. 
+Soit une décomposition à (\textit{k}+1) niveau, on aura \textit{$u^1$}, $\ldots$, \textit{$u^k$} les versions filtrées obtenues de \textit{g}. La dernière version \textit{$u^k$} sera notée \textit{b} et correspondra à la couche de base.
+La couche de détail est définie comme suit : 
+\begin{equation}
+	v^i = u^{i-1} - u^i \textrm{, avec }i=1\ldots k \textrm{ et } u^0=g
+\end{equation}
+
+\paragraph{}
+L'image originale \textit{g} est retrouvé à l'aide de l'équation suivante : 
+\begin{equation}
+\label{eq:recompo}
+	g = b + \sum_{i=1}^{k}v^i
+\end{equation}
+
+\begin{figure}[H]
+	\center
+	\subfloat[Image originale]{\includegraphics[scale=0.6]{images/IM088.png}}
+	~
+	\subfloat[Couche de base]{\includegraphics[scale=0.6]{images/pyramide_methode1_base_it_1_Ss_36_Sr_100_IM088.png}}
+	~	
+	\subfloat[Couche de détails]{\includegraphics[scale=0.6]{images/pyramide_methode1_detail_it_1_Ss_36_Sr_100_IM088.png}}
+	\caption{Décomposition entre la couche de base et la couche de détails}
+	\label{fig:decompositionBaseDetails}
+\end{figure}	
+
+\paragraph{}
+Les différentes méthodes et stratégies misent en place ci-dessous se basent sur l'article \cite{pyramide}. 
+	
+		\subsection{Méthodes}
+		
+\paragraph{}
+La pyramide multi-échelle basée sur le filtre bilatéral peut être construite suivant deux méthodes. Les images sont ensuite reconstruite en utilisant l'équation \eqref{eq:recompo}. 
+		
+			\subsubsection{Méthode n\degre 1}	
+
+\paragraph{}
+Cette méthode consiste à itérer le filtre bilatéral sur l'image originale en modifiant uniquement les paramètres $\sigma_s$ et $\sigma_r$. Les séquences \textit{$u^1$}, $\ldots$, \textit{$u^k$} sont obtenues en résolvant \textit{k} fois le système suivant : 
+\begin{equation}
+\label{eq:methode1}
+	u^{i+1} = BF[g]
+\end{equation}
+
+			\subsubsection{Méthode n\degre 2}		
+
+La deuxième méthode que l'on peut mettre en place consiste à appliquer le filtre bilatéral sur la dernière séquence obtenue, ce qui va donner la formule suivante : 
+\begin{equation}
+\label{eq:methode2}
+	u^{i+1} = BF[u^i]
+\end{equation}
+
+
+		\subsection{Stratégies}		
+
+\paragraph{}
+Deux stratégies peuvent être mise en place afin de réaliser la pyramide multi-échelle. La première consiste à augmenter $\sigma_s$ et $\sigma_r$ à chaque itération. La seconde stratégie consiste à utiliser la méthode n\degre 2 (Eq.~\ref{eq:methode2}) et faire ne faire varier que $\sigma_r$ à chaque itération.
+
+		\subsection{Exemples de décompositions et recompositions}
+
+\paragraph{}
+Les résultats présentés ci-dessous montrent les différentes séquences obtenues ainsi que leur couche de détails et l'image reconstruite.
+
+\begin{figure}[H]
+	\begin{center} 
+		\includegraphics[]{images/pyramide1_rdiv2__36_100_IM088.png} 
+	\end{center} 
+	\caption{Décomposition pyramidale (méthode 1 et stratégie 2 - $\sigma_r$ divisé par 2), paramètre de départ $\sigma_s$=36 et $\sigma_r$=100}
+\end{figure} 
+
+\newpage
+
+\begin{figure}[H]
+	\begin{center} 
+		\includegraphics[]{images/pyramide2_rdiv2__36_100_IM088.png} 
+	\end{center} 
+	\caption{Décomposition pyramidale (méthode 2 et stratégie 2 - $\sigma_r$ divisé par 2), paramètre de départ $\sigma_s$=36 et $\sigma_r$=100}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{center} 
+		\includegraphics[]{images/pyramide1_x2__4_10_flower.png} 
+	\end{center} 
+	\caption{Décomposition pyramidale (méthode 1 et stratégie 1 - facteur 2), paramètre de départ $\sigma_s$=4 et $\sigma_r$=10}
+\end{figure}
+
+		\section{Manipulation des détails} \label{sec:ManipDetails}
+
+			\subsection{Mise en place}
+			
+\paragraph{}
+La décomposition pyramidale multi-échelle permet d'obtenir un ensemble d'images composé de couches de base ($u$) et de détails ($v$). L'image sera reformé avec cet ensemble en utilisant la formule suivante : 
+
+\begin{equation}
+\label{eq:recompo2}
+	g = b + \sum_{i=1}^{k}v^i
+\end{equation}
+			
+\paragraph{}
+Afin de manipuler le niveau de détails de l'image, l'équation \ref{eq:recompo2} va être légèrement modifiée. Les
+différentes couches de détails d et la couche de base b seront multiplié par un coefficient $\beta$ et $\alpha$ ce qui
+donnera l'équation \ref{eq:manipDetail}.
+
+\begin{equation}
+\label{eq:manipDetail}
+	g = \alpha*b + \sum^{k}_{i=1}\beta*(i+1)*v^{i} 
+\end{equation}
+
+\paragraph{}
+Les facteurs $\alpha$ et $\beta$ permettent d'indiquer l'importance des couches et donc de déterminer le niveau de détails à manipuler. Une valeur inférieure d'$\alpha$ par rapport à $\beta$ est utilisée pour rehausser et le contraire pour atténuer. 
+%quels couples de facteurs atténuent? rehaussent? alpha grand, beta petit? le contraire?
+
+			\subsection{Exemples de manipulation des détails : rehaussement}
+			
+\paragraph{}
+De nombreux tests ont été réalisés afin de trouver des valeurs de base pour $\alpha$ et $\beta$ afin de rehausser le niveau de détails de l'image. Ces valeurs de base seront celles utilisées par défaut dans l'application (voir sec.~\ref{sec:InterfaceGraph}).
+
+\begin{figure}[H]
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.4]{images/rock_input1_08_1.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.4]{images/rock_input2_08_1.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.4]{images/rock_input.png}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=1 }
+\end{figure}
+
+\newpage
+
+\begin{figure}
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.4]{images/rock_input1_08_3.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.4]{images/rock_input2_08_3.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.4]{images/rock_input.png}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=3 }
+\end{figure}
+
+\begin{figure}
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.4]{images/rock_input1_08_5.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.4]{images/rock_input2_08_5.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.4]{images/rock_input.png}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=5 }
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.4]{images/flower1_08_1.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.4]{images/flower2_08_1.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.4]{images/flower2.png}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=1 }
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.4]{images/flower1_08_3.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.4]{images/flower2_08_3.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.4]{images/flower2.png}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=3 }
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.4]{images/flower1_08_5.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.4]{images/flower2_08_5.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.4]{images/flower2.png}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=5}
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.4]{images/flower1_08_5.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.4]{images/flower2_08_5.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.4]{images/flower2.png}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=5}
+\end{figure}
+
+\begin{figure}
+	\centering
+        \subfloat[Méthode 1 et 2]{\includegraphics[]{images/lena_08_1.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.5]{images/lena.jpg}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=1}
+\end{figure}
+
+\begin{figure}
+        \centering
+        \subfloat[Méthode 1 et 2]{\includegraphics[]{images/lena_08_3.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.5]{images/lena.jpg}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=3}
+\end{figure}
+
+\begin{figure}
+        \centering
+        \subfloat[Méthode 1 et 2]{\includegraphics[]{images/lena_08_5.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.5]{images/lena.jpg}}
+        \caption{Réhaussement des détails avec $\alpha$=0.8 et $\beta$=5}
+\end{figure}
+
+			
+			\subsection{Exemples de manipulation des détails : atténuation}
+
+\paragraph{}
+Les recherches précédemment effectuées ont été réitérées mais cette fois-ci pour avoir un $\alpha$ et un $\beta$ permettant d'atténuer au mieux les particularités de l'image.
+
+\begin{figure}[H]
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.4]{images/rock_input1_1_08.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.4]{images/rock_input2_1_08.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.4]{images/rock_input.png}}
+        \caption{Atténuation des détails avec $\alpha$=1 et $\beta$=0.8}
+\end{figure}
+
+
+\begin{figure}
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.4]{images/rock_input1_1_05.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.4]{images/rock_input2_1_05.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.4]{images/rock_input.png}}
+        \caption{Atténuation des détails avec $\alpha$=1 et $\beta$=0.5}
+\end{figure}
+
+\begin{figure}
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.45]{images/flower1_1_08.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.45]{images/flower2_1_08.png}}
+        
+        \subfloat[image originale]{\includegraphics[scale=0.45]{images/flower2.png}}
+        \caption{Atténuation des détails avec $\alpha$=1 et $\beta$=0.8}
+\end{figure}
+
+\begin{figure}
+        \centering
+        \subfloat[Méthode 1]{\includegraphics[scale=0.45]{images/flower1_1_05.png}}
+        \qquad \qquad
+        \subfloat[Méthode 2]{\includegraphics[scale=0.45]{images/flower2_1_05.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.45]{images/flower2.png}}
+        \caption{Atténuation des détails avec $\alpha$=1 et $\beta$=0.5}
+\end{figure}
+
+\begin{figure}
+        \centering
+        \subfloat[Méthode 1 et 2]{0\includegraphics[]{images/lena1_08.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.5]{images/lena.jpg}}
+        \caption{Atténuation des détails avec $\alpha$=1 et $\beta$=0.8}
+\end{figure}
+
+\begin{figure}
+        \centering
+        \subfloat[Méthode 1 et 2]{\includegraphics[]{images/lena_1_05.png}}
+        
+        \subfloat[Image originale]{\includegraphics[scale=0.5]{images/lena.jpg}}
+        \caption{Atténuation des détails avec $\alpha$=1 et $\beta$=0.5}
+\end{figure}
+
+
+\chapter{Interface graphique} \label{sec:InterfaceGraph}	
+	\section{Fonctionnalités et structure du système}
+		\subsection{Cas d'utilisation}
+		
+\paragraph{}
+Afin que l'utilisateur puisse utiliser modifier ses images en manipulant le niveau de détails de celle-ci, une interface a été réalisée. \`A partir de celle-ci, il peut effectuer différentes actions (fig.~\ref{fig:UseCase}): 
+\begin{itemize}
+	\item charger une image 
+	\item choisir quel niveau de détails il souhaite manipuler
+	\item rentrer des informations complémentaires : 
+		\begin{itemize}
+			\item le nombre d'itérations
+			\item la valeur de $\sigma_s$
+			\item la valeur de $\sigma_r$
+			\item la valeur de $\alpha$
+			\item la valeur de $\beta$
+		\end{itemize}
+	\item lancer le traitement
+	\item sauvegarder la nouvelle image
+\end{itemize}
+	
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.4]{images/UseCase.png}
+	\caption{Diagramme des cas d'utilisations}
+	\label{fig:UseCase}
+\end{figure}	
+			
+		\subsection{Structure générale}
+
+\paragraph{}
+L'IHM\index{IHM} \footnote{IHM : Interface Homme-Machine} a été développé suivant un modèle MVC\index{MVC} (Modèle-Vue-Contrôleur) à l'aide du framework Qt\index{Qt} en C++\index{C++}. La vue est gérée par la classe \texttt{MainWindow}\index{MainWindow} (voir diagramme de classe \ref{fig:grahCollaborationMW}). Cette classe hérite de \texttt{QMainWindow}\index{QMainWindow}. Cette classe permet de gérer la fenêtre principale d'une application en fournissant différents outils tels qu'une barre de menu, une barre d'outils, une barre d'états, un dock central (pour les différents outils pouvant être nécessaire au widget central) et enfin un widget central (fig.~\ref{fig:CompoMW}). 
+
+Dans notre application seulement le widget central sera utilisé. Mais à l'avenir une barre de menu ou d'outils pourraient être ajouté afin de fournir des utilisations supplémentaires. La barre d'état pourrait elle aussi être utilisé afin de notifier l'utilisateur de l'avancement du traitement ou de l'action en cours. 
+
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.7]{images/CompositionQMainWindow.png}
+	\caption{Compostion d'une fenêtre \texttt{QMainWindow}}
+	\label{fig:CompoMW}
+\end{figure}
+
+\paragraph{}
+Le widget principal a été crée dans une classe à part héritant de \texttt{QWidget}\index{QWidget} appelée \texttt{WidgetImage}\index{WidgetImage}. Il est composé de quatres \texttt{QGroupBox}\index{QGroupBox} et d'un boutton (\texttt{QPushButton}\index{QPushButton}).
+
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.5]{images/widgetImage.png}
+	\caption{Composition du widget central : \texttt{WidgetImage}}
+	\label{fig:compoWI}
+\end{figure}
+
+\paragraph{}
+La classe \texttt{WidgetImage} gère seulement l'affichage du composant ainsi que des images qui s'afficheront dans des \texttt{QLabel} inclus dans des \texttt{QGroupBox}. Ces \texttt{QGroupBox} apparaissent lorsque l'utilisateur charge une image ou à la fin du traitement de celle-ci.
+
+\paragraph{}
+Lorsque l'utilisateur lance le traitement à l'aide du bouton "Lancer" (fig.~\ref{fig:compoWI}), celui-ci va être contrôlé par la classe \texttt{Controller}\index{Controller} qui sera lancé dans un thread (\texttt{ControllerThread}\index{ControllerThread}) à part afin que le traitement ne bloque pas l'application.
+		
+\paragraph{}
+La classe \texttt{FilterBilateral}\index{FilterBilateral}(voir diagramme de classe fig.~\ref{fig:grahCollaborationFB}) modélise la partie "Modèle" du MVC. Elle est uniquement appelée part le contrôleur. L'implémentation du filtre bilatéral\index{Filtre bilatéral} est celle décrite dans la section \ref{sec:implementationFB}.
+		
+	\section{Guide d'utilisation}
+	
+\paragraph{}
+Au lancement de l'application, l'utilisateur ne verra que la partie gauche de l'interface (fig.~\ref{fig:IHMLoadImg}). Il va ensuite pouvoir choisir l'image qu'il souhaite modifié. Pour cela, le bouton "Navigation" va ouvrir une fenêtre de navigation dans les dossiers et affichera l'image à droite s'il y eu une de sélectionné. L'utilisateur ne pourra choisir que des images de types png ou jpeg. 
+	
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.5]{images/screenIHMLoadImg.png}
+	\caption{Visualisation de l'interface après chargement de l'image}
+	\label{fig:IHMLoadImg}
+\end{figure}
+
+\paragraph{}
+Avant de lancer le traitement, il faut choisir le niveau de détails à manipuler : soit rehausser soit atténuer. L'utilisateur a ensuite la possibilité de choisir ses propres paramètres. S'il préfère ne pas utiliser des paramètres personnalisés, ceux par défaut seront pris en compte. Dans le cas où la \texttt{QGroupBox} est coché, il n'est pas nécessaire de renseigner des informations pour tous les champs. Si un champ n'est pas rempli, sa valeur par défaut sera utilisée.
+
+\paragraph{}
+Une fois que l'utilisateur a fini de choisir comme le traitement doit être exécuté, il peut cliquer sur le bouton "Lancer". \`A la fin de la manipulation de l'image, la nouvelle image apparaît (fig.~\ref{fig:IHMLaunch}). Lorsque le traitement est fini, il est possible de sauvegarder l'image.
+
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.35]{images/screenIHMLaunch.png}
+	\caption{Visualisation de l'interface après traitement de l'image}
+	\label{fig:IHMLaunch}
+\end{figure}
+
+
+\chapter{Accélération}
+
+\paragraph{}
+Par la suite nous avons cherché à optimiser nôtre implémentation du filtre bilatéral mais nous nous sommes rendus compte que des versions optimisées existaient déjà. La version du filtre bilatéral présente dans la librairie CImg \index{CImg} ainsi que celle de Paris et Durand \cite{ParisDurand} font partie de ces versions. 
+
+
+	\section{Utilisation du filtre bilatéral comme une convolution}
+
+\paragraph{}
+Cette partie est basée sur l'article de Paris et Durand \cite{acceleration}.
+		\subsection{Rappels}
+\paragraph{}
+Le filtre utilisé précédemment (voir \ref{ssec:FormFB}) est : 
+	\begin{itemize}
+		\item non-linéaire : chaque pixel est remplacé par un poids de ses voisins
+		\item et non-itératif : le résultat est obtenu en un seul passage.
+	\end{itemize}
+Il permet de remplacé chaque pixel par un poids moyen de ses voisins. Ce poids va décroître avec à la fois la distance spatiale dans l'image (le domaine spatial $S$) et la distance en intensité des pixels (le domaine d'intensité $R$). Le filtre bilatéral est défini par ($G_\sigma$ est une fonction gaussienne) : 
+\begin{equation}
+\label{eq:fb2}
+	I_p^{bf} = \frac{1}{W_p^{bf}}\sum_{q\in S} G_{\sigma_s}(\parallel p- q \parallel)G_{\sigma_r}(\mid I_p - I_q \mid) I_q
+\end{equation}
+\begin{equation}
+\label{eq:Wp2}
+	W_p^{bf} = \sum_{q\in S} G_{\sigma_s}(\parallel p- q \parallel)G_{\sigma_r}(\mid I_p - I_q \mid)
+\end{equation}
+$\sigma_s$ défini la taille du voisinage considéré et $\sigma_r$ contrôle l'importance des pixels environnant en fonction de leur intensité. $W_p$ normalise la somme des poids. 
+		
+		\subsection{Approche}		
+		
+\paragraph{}
+Paris et Durand ont cherché à décomposer le filtre bilatéral en une convolution suivie par deux non-linéarités. Pour transformer le filtre en une convolution, une intensité homogène est défini ce qui permet d'obtenir que le terme de la normalisation $W_p^{bf}$ soit un composant homogène après la convolution. Dans l'équation \eqref{eq:fb2}, la non-linéarité vient de la division par $W_p^{bf}$ ainsi que de la dépendance entre l'intensité des pixels par $G_{\sigma_r}(\mid I_p -I_q\mid)$. Chaque point va être étudié séparément et isolé pendant le calcul. 
+
+		\subsection{Intensité homogène}
+
+\paragraph{}
+Une première solution pour palier à la division est de multiplier l'équation \eqref{eq:fb2} des deux côtés par $W_p^{bf}$. Les équation \eqref{eq:fb2} et \eqref{eq:Wp2} sont alors similaire. Ce qui donne l'équation à deux dimensions suivantes : 
+\begin{equation}
+\label{eq:HI1}
+	\binom{W_p^{bf} I_p^{bf}}{W_p^{bf}} = \sum_{q\in S} G_{\sigma_s}(\parallel p- q \parallel)G_{\sigma_r}(\mid I_p - I_q \mid) \binom{I_q}{1}
+\end{equation}
+
+\paragraph{}
+Afin de maintenir que le filtre est moyenne pondérée, une fonction $W$ est introduite. Celle-ci vaut 1 en tout point, ce qui donne : 
+\begin{equation}
+	\label{eq:HIw}
+	\binom{W_p^{bf} I_p^{bf}}{W_p^{bf}} = \sum_{q\in S} G_{\sigma_s}(\parallel p- q \parallel)G_{\sigma_r}(\mid I_p - I_q \mid) \binom{W_q I_q}{W_q}
+\end{equation}
+
+\paragraph{}
+En assignant à chaque pixel $q$ un couple $(W_q I_q , W_q)$, les pixels filtrés sont exprimés comme une combinaison linéaire de leurs voisins. La division n'a pas encore été supprimée car pour accéder à la valeur individuelle d'un pixel, le premier coordonnée $(WI)$ doit encore être divisé par le second $(W)$. Le couple $(WI,W)$ est appelé  l'intensité homogène. 
+
+Bien-que l'équation \eqref{eq:HIw} soit une combinaison linéaire, cela ne définit pas un filtre linéaire puisque le poids dépend de la valeur actuelle des pixels. 
+
+ 		\subsection{Convolution}
+ 		
+\paragraph{}
+Si l'on ignore le terme $G_{\sigma_r}(\mid I_p - I_q \mid)$, l'équation \eqref{eq:HIw} est une convolution gaussienne : 
+
+$(W_q^{bf} I_q^{bf} , W_q^{bf}) = G_{\sigma_s} \otimes (WI, W)$. Mais l'intensité des poids dépend de $I_p - I_q$ et il n'y a pas de somme de $I$. Pour surmonter ce point, une dimension additionnelle $\zeta$ est introduite. Avec le symbole de Kronecker $\delta(\zeta)$ (1 si $\zeta = 0$, 0 sinon) et $R$ l'intervalle sur lequel l'intensité est définie, l'équation \eqref{eq:HIw} est réécrite en utilisant $[\delta(\zeta-I_q)=1] \leftrightarrow [\zeta = I_q]$ : 
+	\begin{equation}
+	\label{eq:HIzeta}
+	\binom{W_p^{bf} I_p^{bf}}{W_p^{bf}} = \sum_{q\in S}\sum_{\zeta\in R} G_{\sigma_s}(\parallel p- q \parallel)G_{\sigma_r}(\mid I_p - \zeta \mid)\delta(\zeta-I_q) \binom{W_q I_q}{W_q}
+\end{equation}
+
+\paragraph{}
+L'équation \eqref{eq:HIzeta} est une somme sur le produit dans l'espace $SxR$. Les fonctions définies dans $SxR$ sont en minuscules. Le produit $G_{\sigma_s}G_{\sigma_r}$ défini une gaussienne $g_{\sigma_s ,\sigma_r}$ dans $SxR$ : 
+\begin{equation}
+	g_{\sigma_s ,\sigma_r} : (x\in S, \zeta \in R) \mapsto G_{\sigma_s}[\parallel x \parallel)G_{\sigma_r}(\mid \zeta \mid)
+\end{equation}
+Deux fonctions $i$ et $w$ sont crées : 
+\begin{align}
+	i : &(x\in S, \zeta \in R) \mapsto I_x \\
+	w : &(x\in S, \zeta \in R) \mapsto \delta(\zeta - I_x)W_x
+\end{align}
+Ce qui donne les relations suivantes : 
+\begin{align}
+	I_x &= i(x,I_x) \\
+	W_x &= w(x,I_x) \\
+	\forall \zeta &\neq I_x, w(x,\zeta)=0
+\end{align}
+
+L'équation \eqref{eq:HIzeta} est réécrite de la manière suivante : 
+\begin{equation}
+\label{eq:convo}
+	\binom{W_p^{bf} I_p^{bf}}{W_p^{bf}} = \sum_{(q,\zeta)\in SxR} g_{\sigma_s ,\sigma_r}(p-q, I_p -\zeta)\binom{w(q,\zeta)i(q,\zeta)}{w(q,\zeta)}
+\end{equation}
+
+La formule ci-dessous correspond à la valeur au point $(p,I_p)$ de la convolution entre $g_{\sigma_s ,\sigma_r}$ et la fonction à deux dimensions $(wi,w)$ : 
+\begin{equation}
+\label{eq:convoPoint}
+	\binom{W_p^{bf} I_p^{bf}}{W_p^{bf}} = \left[ g_{\sigma_s ,\sigma_r} \otimes \binom{wi}{w}\right] (p,I_p)
+\end{equation}
+
+Les fonctions $i^{bf}$ et $w^{bf}$ sont introduites : 
+\begin{equation}
+	(w^{bf}i^{bf}, w^{bf}) = g_{\sigma_s ,\sigma_r} \otimes (wi,w)
+\end{equation}
+
+\paragraph{}
+Le filtre est exprimé comme une convolution suivie d'opérations non-linéaires : 
+\begin{align}
+	(w^{bf}i^{bf}, w^{bf}) &= g_{\sigma_s ,\sigma_r} \otimes (wi,w) && \text{(linéaire)} \\
+	I_p^{bf} &= \frac{w^{bf}(p,I_p)i^{bf}(p,I_p)}{w^{bf}(p,I_p)} && \text{(non-linéaire)}
+\end{align}
+
+\paragraph{}
+La partie non-linéaire est en réalité composée de deux opérations. Les fonctions $w^{bf}i^{bf}$ et $w^{bf}$ sont calculées au point $(p,I_p)$. Cette opération est nommée \textit{slicing}. La deuxième opération non-linéaire est la division. Dans ce cas, le \textit{slicing} et la division commute, c'est-à-dire que le résultat est indépendant de l'ordre car $g_{\sigma_s ,\sigma_r}$ est positif et $w$ vaut soit 0 soit 1, ce qui assure que $w^{bf}$ est positif.
+
+	\section{Implémentation de Paris et Durand}
+
+\paragraph{}
+Le domaine spatial $S$ est un plan classique dans l'image $xy$ et le domaine d'intensité $R$ est un simple axe $\zeta$. La fonction $w$ peut être interprétée comme le graph dans l'espace $xy\zeta$ de $\zeta=I(x,y)$, c'est-à-dire que $w$ est null partout sauf sur les points $(x,y,I(x,y))$ où il vaut 1. La fonction $wi$ est similaire à $w$. \`A la place d'utiliser des valeurs binaires (0 ou 1), 0 ou $I(x,y)$ sont utilisé. 
+
+\paragraph{}
+En premier, on applique une convolution gaussienne définie sur $xy\zeta$ à $wi$ et $w$. Ce qui permet d'obtenir les fonctions $w^{bf}i^{bf}$ et $w^{bf}$. Pour chaque point de l'espace $xy\zeta$, on calcule $i^{bf}(x,y,\zeta)$ en divisant $w^{bf}(x,y,\zeta)i^{bf}(x,y,\zeta)$ par $w^{bf}(x,y,\zeta)$. La dernière étape consiste à obtenir la valeur du pixel $(x,y)$ de l'image filtrée $I^{bf}$ qui correspond directement à la valeur de $i^{bf}$ en $(x,y,I(x,y))$. 
+
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.5]{images/processConvo.png}
+	\caption[Processus appliqué à un signal 1D]{Les données de bases (ligne du hau) sont représentées par une fonction à deux dimensions $(wi,w)$ (seconde ligne). \`A cette fonction est appliqué une convolution gaussienne pour obtenir $(w^{bf}i^{bf},w^{bf})$ (troisième ligne). La première composante est divisé par la seconde (quatrième ligne). Le résultat final est obtenu en extrayant par échantillonnage la valeur à la position des données de bases.}
+	\label{fig:processConvo}
+\end{figure}
+	
+\paragraph{}
+Sur leur site \cite{ParisDurand}, Paris et Durand propose différentes versions du filtre bilatéral optimisé : pour les images RGB ou en niveau de gris, une version utilisant les transformées rapides de fourrier.
+	
+	
+	\section{Implémentation de CImg}\index{CImg}
+
+\paragraph{}
+L'implémentation du filtre bilatéral dans la librairie CImg utilise les techniques d'optimisation proposé dans l'article de Paris et Durand \cite{acceleration}. La librairie permet aussi d'appliquer le filtre sur des objets 3D. Cette version est basé sur l'implémentation du filtre pour MATLAB réalisé par Jiawen Chen \cite{ChenMatlab}.
+
+
+	\section{Comparaison entre les différents filtres}
+
+\paragraph{}	
+Les résultats présentés ci-après sont une moyenne calculée à partir de 5 tests. 
+
+\paragraph{}
+Les tests ont été faits dans une machine virtuelle dont voici les caractéristiques : 
+\begin{description}
+	\item Machine hôte
+		\begin{itemize}
+			\item Windows 7 64bits
+			\item 8Go RAM
+			\item \href{http://ark.intel.com/fr/products/39720/Intel-Xeon-Processor-W3550-8M-Cache-3_06-GHz-4_80-GTs-Intel-QPI}{Intel(R)Xeon(R)CPU W3550 @ 3.06GHz}
+		\end{itemize}
+	\item Machine virtuelle
+		\begin{itemize}
+			\item Manjaro 64Bits
+			\item 4Go RAM
+			\item 4 Core
+		\end{itemize}
+\end{description}	
+	
+\paragraph{}
+Afin de pouvoir intégrer à notre interface (voir chap.~ \ref{sec:InterfaceGraph}) la version de l'implémentation du filtre bilatéral la plus rapide, elles ont été comparées avec différentes images RGB  de tailles diverses et avec différentes valeurs de $\sigma_s$ et $\sigma_r$.
+
+\begin{figure}[H]
+        \centering
+        \subfloat[$\sigma_s=16$ et $\sigma_r=0.1$]{\includegraphics[scale=0.4]{images/benchmarkFiltreS16R01.png}}
+        \subfloat[$\sigma_s=16$ et $\sigma_r=1$]{\includegraphics[scale=0.4]{images/benchmarkFiltreS16R1.png}}
+        
+        \subfloat[$\sigma_s=46$ et $\sigma_r=0.1$]{\includegraphics[scale=0.4]{images/benchmarkFiltreS46R01.png}}
+        \subfloat[$\sigma_s=46$ et $\sigma_r=1$]{\includegraphics[scale=0.4]{images/benchmarkFiltreS46R1.png}}
+        \caption{Comparaison sur un jeu d'images des différents filtres}
+\end{figure}
+
+\paragraph{}
+On remarque facilement que la courbe censée représentée le temps d'exécution du filtre de CImg\index{CImg} (en bleu) n'est quasiment jamais visible grâce à sa rapidité par rapport aux autres. L'implémentation de Paris et Durand est légèrement moins rapide que celle de Cimg sur des images de grandes tailles (ici dragon.ppm, la plus petite étant housecorner). La rapidité dépend principalement de la taille de l'image. Il en va de même pour la version du filtre naïve.
+
+C'est donc le filtre bilatéral implémenté dans la librairie CImg qui sera ajouté à l'interface graphique afin de rendre le rendu de l'image plus rapide.
+
+\chapter{Conclusion}
+
+\paragraph{}
+\`A la fin du temps imparti pour réaliser ce projet, on peut dire que les différents objectifs fixés au début ont été atteints. En effet l'interface permettant de manipuler à différents niveaux les détails d'une image a été réalisé au début avec une implémentation naîve du filtre bilatéral puis par la suite celle-ci a été remplacée par une version optimisée (celle de la librairie CImg). 
+
+\paragraph{}
+Cela a été un réel plaisir de pouvoir travailler pendant au temps de mois sur un sujet de traitement d'image. Cela m'a permis d'améliorer mes compétences dans ce domaine et de mieux comprendre certains cours  que j'ai pu suivre cette année. 
+
+
+\paragraph{}
+On peut déjà commencer à envisager diverses idées d'améliorations tels que l'ajout de manipulation d'objet 3D soit en utilisant l'outil présent dans la librairie CImg soit en créant le nôtre ou bien chercher à améliorer la manipulation des détails en rajoutant des niveaux et en cherchant des paramètres de base qui correspondront à plus d'image. La reconstruction des images pourraient être faite différemment, par exemple en passant par des gradients comme dans l'article \cite{pyramide}. 
+
+
+
+\annexes
+
+\chapter{Ressources complémentaires}
+\paragraph{}
+Ci-dessous sont disponibles toutes les ressources mentionnées dans ce rapport.
+
+\begin{figure}[H]
+	\center
+	\includegraphics[scale=0.8]{images/class_filter_bilateral__coll__graph.png}
+	\caption{Graphe de collaboration de la classe \texttt{FilterBilateral}}
+	\label{fig:grahCollaborationFB}
+\end{figure}
+
+\begin{figure}[h]
+	\center
+	\includegraphics[scale=0.55]{images/class_main_window__coll__graph.png}
+	\caption{Graphe de collaboration de la classe \texttt{MainWindow}}
+	\label{fig:grahCollaborationMW}
+\end{figure} 
+
+
+\printindex
+\addcontentsline{toc}{chapter}{Index}
+
+\bibliography{biblio}
+\bibliographystyle{unsrt}
+\addcontentsline{toc}{chapter}{Bibliographie}
+
+\end{document}
+
