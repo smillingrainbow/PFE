@@ -1,5 +1,4 @@
 *.o
-Dev/Test/
 *.aux
 *.bbl
 *.blg
@@ -10,9 +9,9 @@ Dev/Test/
 *.toc
 *.out
 *.kdev4
-bin/
 Image/
 QT_TP/
+bin/
 *.acn
 *.acr
 *.alg
