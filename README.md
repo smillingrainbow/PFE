@@ -1,11 +1,16 @@
-PFE
-===
-Dossier Articles : Contient les articles de références et le sujet du PFE
+#PFE#
+===================================================================
 
-Dossier Rapport : Contient tous les différents rapports et présentation
 
-Dossier Dev : 
-	- Benchmark : Code pour les benchmarks (CImg, Paris et Durand, FB Naif) base d'images utilisées dans le dossier
+##Dossier Articles##
+Contient les articles de références et le sujet du PFE
+
+##Dossier Rapport##
+Contient tous les différents rapports et présentation
+
+##Dossier Dev##
+
+ - Benchmark : Code pour les benchmarks (CImg, Paris et Durand, FB Naif) base d'images utilisées dans le dossier
 	- Doc : Documentation du filtre et de l'interface (disponible en pdf et html)
 	- Filtre_Bilateral_Naif : 
 		- Filtre_Bilateral_Detail : 
@@ -26,3 +31,4 @@ Dossier Dev :
 	- Test : 
 		- ValidationFB : 
 			Code pour valider l'implémentation naïve du FB (Comparaison avec CImg)
+
